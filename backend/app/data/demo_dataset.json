@@ -1,0 +1,518 @@
+{
+  "recipes": [
+    {
+      "recipe_id": "rec_001",
+      "title": "Homestyle Dal Tadka",
+      "cuisine": "North Indian",
+      "diet": "vegan",
+      "prep_time_minutes": 10,
+      "cook_time_minutes": 20,
+      "total_time_minutes": 30,
+      "servings": 4,
+      "image_url": "https://images.unsplash.com/photo-1546833999-b9f581a1996d?auto=format&fit=crop&w=800&q=80",
+      "core_ingredients": ["lentils", "cumin", "garlic", "turmeric"],
+      "ingredients": [
+        {"name": "lentils", "quantity": 200, "unit": "g"},
+        {"name": "turmeric", "quantity": 5, "unit": "g"},
+        {"name": "cumin", "quantity": 5, "unit": "g"},
+        {"name": "garlic", "quantity": 20, "unit": "g"},
+        {"name": "onion", "quantity": 100, "unit": "g"},
+        {"name": "tomato", "quantity": 120, "unit": "g"},
+        {"name": "red chilli", "quantity": 4, "unit": "g"},
+        {"name": "salt", "quantity": 6, "unit": "g"},
+        {"name": "oil", "quantity": 15, "unit": "ml"}
+      ],
+      "utensils": ["pot", "pan", "spatula"],
+      "instructions": [
+        "Rinse lentils thoroughly and pressure cook or boil with water, turmeric, and half the salt until tender (approx 15 minutes).",
+        "Heat oil or ghee in a pan over medium heat. Crackle cumin seeds until fragrant and golden.",
+        "Add finely sliced garlic and chopped onions. Sauté until lightly browned and aromatic.",
+        "Add diced tomatoes and red chilli powder. Cook until tomatoes soften and oil separates.",
+        "Pour the aromatic tadka (tempering) over the boiled lentils. Stir gently and simmer for 3 minutes.",
+        "Garnish with freshly chopped coriander leaves and serve hot with basmati rice or roti."
+      ],
+      "nutrition_per_serving": {
+        "calories": 215,
+        "protein": 11.8,
+        "carbs": 33.4,
+        "fat": 4.6,
+        "fibre": 8.2
+      },
+      "molecular_profile": {
+        "dominant_aroma": "cuminaldehyde + allicin + curcumin",
+        "coherence_score": 0.94,
+        "notes": "Classic tempering synergy: cumin's cuminaldehyde balances garlic's sulfurous diallyl disulfide."
+      }
+    },
+    {
+      "recipe_id": "rec_002",
+      "title": "Paneer Tikka Masala (Skillet Style)",
+      "cuisine": "North Indian",
+      "diet": "vegetarian",
+      "prep_time_minutes": 15,
+      "cook_time_minutes": 25,
+      "total_time_minutes": 40,
+      "servings": 3,
+      "image_url": "https://images.unsplash.com/photo-1565557623262-b51c2513a641?auto=format&fit=crop&w=800&q=80",
+      "core_ingredients": ["paneer", "tomato", "onion", "garam masala"],
+      "ingredients": [
+        {"name": "paneer", "quantity": 250, "unit": "g"},
+        {"name": "onion", "quantity": 150, "unit": "g"},
+        {"name": "tomato", "quantity": 200, "unit": "g"},
+        {"name": "garlic", "quantity": 15, "unit": "g"},
+        {"name": "ginger", "quantity": 15, "unit": "g"},
+        {"name": "turmeric", "quantity": 4, "unit": "g"},
+        {"name": "red chilli", "quantity": 5, "unit": "g"},
+        {"name": "cumin", "quantity": 4, "unit": "g"},
+        {"name": "coriander", "quantity": 6, "unit": "g"},
+        {"name": "oil", "quantity": 20, "unit": "ml"},
+        {"name": "salt", "quantity": 6, "unit": "g"}
+      ],
+      "utensils": ["skillet", "spatula", "blender"],
+      "instructions": [
+        "Cube paneer into bite-sized pieces and sear lightly in a hot skillet with 5ml oil until golden edges appear. Set aside.",
+        "In the same skillet, toast cumin seeds, then sauté chopped onions, minced ginger, and garlic until caramelized.",
+        "Add pureed tomatoes, turmeric, red chilli powder, and coriander powder. Simmer for 10 minutes until thick and glossy.",
+        "Stir in seared paneer cubes and season with salt. Simmer gently on low heat for 5 minutes so flavours penetrate.",
+        "Finish with a sprinkle of crushed fenugreek leaves (kasuri methi) or garam masala."
+      ],
+      "nutrition_per_serving": {
+        "calories": 365,
+        "protein": 17.5,
+        "carbs": 14.8,
+        "fat": 26.2,
+        "fibre": 3.9
+      },
+      "molecular_profile": {
+        "dominant_aroma": "lactic diacetyl + glutamic umami + eugenol",
+        "coherence_score": 0.91,
+        "notes": "Tomato's natural glutamate amplifies dairy richness of paneer; coriander linalool brightens the sauce."
+      }
+    },
+    {
+      "recipe_id": "rec_003",
+      "title": "Jeera Rice (Fragrant Cumin Basmati)",
+      "cuisine": "Indian",
+      "diet": "vegan",
+      "prep_time_minutes": 5,
+      "cook_time_minutes": 15,
+      "total_time_minutes": 20,
+      "servings": 3,
+      "image_url": "https://images.unsplash.com/photo-1512058564366-18510be2db19?auto=format&fit=crop&w=800&q=80",
+      "core_ingredients": ["rice", "cumin", "oil", "cloves"],
+      "ingredients": [
+        {"name": "rice", "quantity": 200, "unit": "g"},
+        {"name": "cumin", "quantity": 8, "unit": "g"},
+        {"name": "cloves", "quantity": 2, "unit": "g"},
+        {"name": "cardamom", "quantity": 2, "unit": "g"},
+        {"name": "cinnamon", "quantity": 2, "unit": "g"},
+        {"name": "oil", "quantity": 15, "unit": "ml"},
+        {"name": "salt", "quantity": 5, "unit": "g"}
+      ],
+      "utensils": ["pot", "lid", "fork"],
+      "instructions": [
+        "Rinse basmati rice until water runs clear; soak for 15 minutes and drain.",
+        "Heat oil in a heavy-bottomed pot over medium heat. Add cloves, green cardamom, and cinnamon stick.",
+        "Add whole cumin seeds and allow them to crackle and release their warm nutty aroma.",
+        "Add drained rice and gently toast grains in the spiced oil for 1-2 minutes.",
+        "Add 380ml water and salt. Bring to a rapid rolling boil, then lower heat to minimum, cover tightly with a lid, and cook for 12 minutes.",
+        "Rest covered for 5 minutes, then fluff gently with a fork and serve."
+      ],
+      "nutrition_per_serving": {
+        "calories": 248,
+        "protein": 4.6,
+        "carbs": 44.5,
+        "fat": 5.8,
+        "fibre": 1.4
+      },
+      "molecular_profile": {
+        "dominant_aroma": "2-acetyl-1-pyrroline + cuminaldehyde + eugenol",
+        "coherence_score": 0.96,
+        "notes": "Basmati rice aroma molecule 2-AP pairs synergistically with warm terpenes in whole cumin."
+      }
+    },
+    {
+      "recipe_id": "rec_004",
+      "title": "Aloo Jeera (Golden Cumin Spiced Potatoes)",
+      "cuisine": "North Indian",
+      "diet": "vegan",
+      "prep_time_minutes": 10,
+      "cook_time_minutes": 15,
+      "total_time_minutes": 25,
+      "servings": 2,
+      "image_url": "https://images.unsplash.com/photo-1589301760014-d929f3979dbc?auto=format&fit=crop&w=800&q=80",
+      "core_ingredients": ["cumin", "turmeric", "red chilli", "oil"],
+      "ingredients": [
+        {"name": "potatoes", "quantity": 300, "unit": "g"},
+        {"name": "cumin", "quantity": 8, "unit": "g"},
+        {"name": "turmeric", "quantity": 4, "unit": "g"},
+        {"name": "red chilli", "quantity": 4, "unit": "g"},
+        {"name": "coriander", "quantity": 5, "unit": "g"},
+        {"name": "ginger", "quantity": 10, "unit": "g"},
+        {"name": "oil", "quantity": 15, "unit": "ml"},
+        {"name": "salt", "quantity": 5, "unit": "g"}
+      ],
+      "utensils": ["pan", "spatula"],
+      "instructions": [
+        "Boil and peel potatoes, then cube into 1-inch chunks.",
+        "Heat oil in a wide pan over medium flame. Toss in generous cumin seeds and let them sizzle.",
+        "Add julienned fresh ginger and green/red chillies. Sauté for 30 seconds.",
+        "Add cubed potatoes, turmeric powder, red chilli powder, and salt. Toss well to coat every potato edge.",
+        "Cook on medium-high heat for 6-8 minutes without stirring excessively so potatoes form a crisp golden crust.",
+        "Sprinkle freshly crushed coriander seeds or powder and serve piping hot."
+      ],
+      "nutrition_per_serving": {
+        "calories": 210,
+        "protein": 3.8,
+        "carbs": 33.2,
+        "fat": 7.4,
+        "fibre": 4.1
+      },
+      "molecular_profile": {
+        "dominant_aroma": "cuminaldehyde + gingerol + starch maillard notes",
+        "coherence_score": 0.89,
+        "notes": "Crispy pan-seared potato sugars blend with earthy curcumenol and cumin terpenes."
+      }
+    },
+    {
+      "recipe_id": "rec_005",
+      "title": "Classic Chana Masala (Spiced Chickpeas)",
+      "cuisine": "Punjabi",
+      "diet": "vegan",
+      "prep_time_minutes": 10,
+      "cook_time_minutes": 25,
+      "total_time_minutes": 35,
+      "servings": 4,
+      "image_url": "https://images.unsplash.com/photo-1546833999-b9f581a1996d?auto=format&fit=crop&w=800&q=80",
+      "core_ingredients": ["chickpeas", "onion", "tomato", "cumin"],
+      "ingredients": [
+        {"name": "chickpeas", "quantity": 350, "unit": "g"},
+        {"name": "onion", "quantity": 150, "unit": "g"},
+        {"name": "tomato", "quantity": 180, "unit": "g"},
+        {"name": "garlic", "quantity": 15, "unit": "g"},
+        {"name": "ginger", "quantity": 15, "unit": "g"},
+        {"name": "cumin", "quantity": 5, "unit": "g"},
+        {"name": "coriander", "quantity": 8, "unit": "g"},
+        {"name": "turmeric", "quantity": 4, "unit": "g"},
+        {"name": "red chilli", "quantity": 5, "unit": "g"},
+        {"name": "oil", "quantity": 20, "unit": "ml"},
+        {"name": "salt", "quantity": 6, "unit": "g"}
+      ],
+      "utensils": ["pot", "spatula"],
+      "instructions": [
+        "Heat oil in a deep pot; splutter cumin seeds.",
+        "Add finely minced onions, garlic, and ginger paste. Cook patiently until deep reddish-brown.",
+        "Add chopped tomatoes, turmeric, chilli powder, and ground coriander. Simmer until oil glazes the edges.",
+        "Add cooked chickpeas along with their cooking broth. Slightly mash a spoonful of chickpeas to thicken gravy naturally.",
+        "Simmer on medium-low for 15 minutes, allowing spices to soak into the chickpeas.",
+        "Finish with fresh lemon juice and ginger matchsticks."
+      ],
+      "nutrition_per_serving": {
+        "calories": 278,
+        "protein": 12.4,
+        "carbs": 42.1,
+        "fat": 7.1,
+        "fibre": 9.8
+      },
+      "molecular_profile": {
+        "dominant_aroma": "linalool + allicin + capsaicin",
+        "coherence_score": 0.93,
+        "notes": "Chickpea pyrazines harmonize with roasted onion disulfides and coriander linalool."
+      }
+    },
+    {
+      "recipe_id": "rec_006",
+      "title": "Black Pepper & Garlic Chicken Skillet",
+      "cuisine": "South Indian / Chettinad Inspired",
+      "diet": "non-vegetarian",
+      "prep_time_minutes": 10,
+      "cook_time_minutes": 20,
+      "total_time_minutes": 30,
+      "servings": 3,
+      "image_url": "https://images.unsplash.com/photo-1604908176997-125f25cc6f3d?auto=format&fit=crop&w=800&q=80",
+      "core_ingredients": ["chicken", "black pepper", "garlic", "onion"],
+      "ingredients": [
+        {"name": "chicken", "quantity": 400, "unit": "g"},
+        {"name": "black pepper", "quantity": 8, "unit": "g"},
+        {"name": "garlic", "quantity": 25, "unit": "g"},
+        {"name": "onion", "quantity": 120, "unit": "g"},
+        {"name": "ginger", "quantity": 15, "unit": "g"},
+        {"name": "turmeric", "quantity": 3, "unit": "g"},
+        {"name": "oil", "quantity": 15, "unit": "ml"},
+        {"name": "salt", "quantity": 6, "unit": "g"}
+      ],
+      "utensils": ["skillet", "spatula"],
+      "instructions": [
+        "Marinate diced chicken with turmeric, a pinch of salt, and half the freshly crushed black pepper.",
+        "Heat oil in a heavy iron skillet over high heat. Sear chicken pieces for 4-5 minutes until browned.",
+        "Push chicken to the sides, add finely minced garlic and sliced onions to the center. Sauté until garlic turns aromatic and golden.",
+        "Toss together, lower heat to medium, and cover for 8 minutes until chicken is cooked through.",
+        "Uncover, turn heat high, and toss with the remaining freshly ground black pepper for a pungent, peppery glaze."
+      ],
+      "nutrition_per_serving": {
+        "calories": 285,
+        "protein": 34.2,
+        "carbs": 6.8,
+        "fat": 13.5,
+        "fibre": 1.9
+      },
+      "molecular_profile": {
+        "dominant_aroma": "piperine + allicin + beta-caryophyllene",
+        "coherence_score": 0.95,
+        "notes": "Black pepper's piperine increases bioavailability of all nutrients while pairing intensely with garlic's allicin."
+      }
+    },
+    {
+      "recipe_id": "rec_007",
+      "title": "Golden Turmeric Milk (Haldi Doodh / Golden Elixir)",
+      "cuisine": "Ayurvedic / Wellness",
+      "diet": "vegetarian",
+      "prep_time_minutes": 3,
+      "cook_time_minutes": 7,
+      "total_time_minutes": 10,
+      "servings": 1,
+      "image_url": "https://images.unsplash.com/photo-1544787219-7f47ccb76574?auto=format&fit=crop&w=800&q=80",
+      "core_ingredients": ["turmeric", "black pepper", "cardamom", "cinnamon"],
+      "ingredients": [
+        {"name": "milk", "quantity": 250, "unit": "ml"},
+        {"name": "turmeric", "quantity": 3, "unit": "g"},
+        {"name": "black pepper", "quantity": 1, "unit": "g"},
+        {"name": "cardamom", "quantity": 2, "unit": "g"},
+        {"name": "cinnamon", "quantity": 2, "unit": "g"},
+        {"name": "ginger", "quantity": 5, "unit": "g"}
+      ],
+      "utensils": ["saucepan", "whisk", "mug"],
+      "instructions": [
+        "Pour milk into a small saucepan over medium heat.",
+        "Whisk in pure turmeric powder, a pinch of freshly cracked black pepper, crushed green cardamom pods, and a cinnamon stick.",
+        "Gently simmer for 5-7 minutes without boiling over to allow curcumin and volatile aromatics to infuse.",
+        "Strain into a mug, sweeten with honey or jaggery if desired, and sip warm."
+      ],
+      "nutrition_per_serving": {
+        "calories": 160,
+        "protein": 8.2,
+        "carbs": 12.0,
+        "fat": 8.5,
+        "fibre": 1.2
+      },
+      "molecular_profile": {
+        "dominant_aroma": "curcumin + piperine + cinnamaldehyde",
+        "coherence_score": 0.98,
+        "notes": "Piperine enhances curcumin absorption by 2000% according to biochemical nutritional gastronomy."
+      }
+    },
+    {
+      "recipe_id": "rec_008",
+      "title": "Palak Paneer (Creamy Spiced Spinach with Cottage Cheese)",
+      "cuisine": "North Indian",
+      "diet": "vegetarian",
+      "prep_time_minutes": 15,
+      "cook_time_minutes": 20,
+      "total_time_minutes": 35,
+      "servings": 3,
+      "image_url": "https://images.unsplash.com/photo-1601050690597-df0568f70950?auto=format&fit=crop&w=800&q=80",
+      "core_ingredients": ["spinach", "paneer", "garlic", "cumin"],
+      "ingredients": [
+        {"name": "spinach", "quantity": 300, "unit": "g"},
+        {"name": "paneer", "quantity": 200, "unit": "g"},
+        {"name": "garlic", "quantity": 20, "unit": "g"},
+        {"name": "onion", "quantity": 100, "unit": "g"},
+        {"name": "ginger", "quantity": 10, "unit": "g"},
+        {"name": "cumin", "quantity": 5, "unit": "g"},
+        {"name": "turmeric", "quantity": 3, "unit": "g"},
+        {"name": "oil", "quantity": 15, "unit": "ml"},
+        {"name": "salt", "quantity": 5, "unit": "g"}
+      ],
+      "utensils": ["pot", "blender", "pan"],
+      "instructions": [
+        "Blanch spinach leaves in boiling salted water for 2 minutes, then immediately plunge into ice water to preserve bright emerald green chlorophyll.",
+        "Blend the blanched spinach with green chillies into a smooth velvet puree.",
+        "Heat oil in a pan, add cumin seeds, minced garlic, and onions. Sauté until lightly browned.",
+        "Pour in spinach puree, add turmeric and salt, and simmer gently on low heat for 5 minutes.",
+        "Gently fold in fresh soft paneer cubes. Warm through for 3 minutes and finish with a squeeze of fresh lemon."
+      ],
+      "nutrition_per_serving": {
+        "calories": 285,
+        "protein": 15.6,
+        "carbs": 9.2,
+        "fat": 21.4,
+        "fibre": 3.8
+      },
+      "molecular_profile": {
+        "dominant_aroma": "lactic cream + allicin + chlorophyll herbal notes",
+        "coherence_score": 0.92,
+        "notes": "Garlic's allicin cuts through the earthy iron notes of spinach while paneer provides creamy contrast."
+      }
+    },
+    {
+      "recipe_id": "rec_009",
+      "title": "Egg Bhurji (Street-Style Spiced Scramble)",
+      "cuisine": "Indian Street Food",
+      "diet": "non-vegetarian",
+      "prep_time_minutes": 5,
+      "cook_time_minutes": 10,
+      "total_time_minutes": 15,
+      "servings": 2,
+      "image_url": "https://images.unsplash.com/photo-1525351484163-7529414344d8?auto=format&fit=crop&w=800&q=80",
+      "core_ingredients": ["eggs", "onion", "tomato", "turmeric"],
+      "ingredients": [
+        {"name": "eggs", "quantity": 4, "unit": "large"},
+        {"name": "onion", "quantity": 100, "unit": "g"},
+        {"name": "tomato", "quantity": 80, "unit": "g"},
+        {"name": "green chilli", "quantity": 10, "unit": "g"},
+        {"name": "turmeric", "quantity": 3, "unit": "g"},
+        {"name": "red chilli", "quantity": 3, "unit": "g"},
+        {"name": "cumin", "quantity": 3, "unit": "g"},
+        {"name": "oil", "quantity": 15, "unit": "ml"},
+        {"name": "salt", "quantity": 4, "unit": "g"}
+      ],
+      "utensils": ["skillet", "spatula", "bowl"],
+      "instructions": [
+        "Whisk eggs with salt and turmeric in a small bowl.",
+        "Heat oil in a skillet; crackle cumin seeds, then add finely chopped onions and green chillies. Sauté until translucent.",
+        "Add chopped tomatoes and red chilli powder. Cook for 2-3 minutes until tomatoes are soft.",
+        "Pour in the whisked eggs on medium heat. Stir continuously with a spatula to scramble into soft, spiced curds.",
+        "Do not overcook; remove from heat while still juicy. Serve with toasted buttered pav or bread."
+      ],
+      "nutrition_per_serving": {
+        "calories": 242,
+        "protein": 14.8,
+        "carbs": 5.4,
+        "fat": 17.8,
+        "fibre": 1.2
+      },
+      "molecular_profile": {
+        "dominant_aroma": "egg albumin + cumin + fried onion sulfur compounds",
+        "coherence_score": 0.90,
+        "notes": "Sulfuric compounds in egg yolk find an aromatic counterpart in caramelized allium volatiles."
+      }
+    },
+    {
+      "recipe_id": "rec_010",
+      "title": "South Indian Tomato Rasam (Fiery Pepper-Garlic Broth)",
+      "cuisine": "South Indian",
+      "diet": "vegan",
+      "prep_time_minutes": 5,
+      "cook_time_minutes": 15,
+      "total_time_minutes": 20,
+      "servings": 3,
+      "image_url": "https://images.unsplash.com/photo-1547592180-85f173990554?auto=format&fit=crop&w=800&q=80",
+      "core_ingredients": ["tomato", "black pepper", "garlic", "mustard seeds"],
+      "ingredients": [
+        {"name": "tomato", "quantity": 250, "unit": "g"},
+        {"name": "black pepper", "quantity": 6, "unit": "g"},
+        {"name": "cumin", "quantity": 5, "unit": "g"},
+        {"name": "garlic", "quantity": 20, "unit": "g"},
+        {"name": "mustard seeds", "quantity": 4, "unit": "g"},
+        {"name": "turmeric", "quantity": 3, "unit": "g"},
+        {"name": "oil", "quantity": 10, "unit": "ml"},
+        {"name": "salt", "quantity": 5, "unit": "g"}
+      ],
+      "utensils": ["pot", "mortar and pestle"],
+      "instructions": [
+        "Coarsely crush black pepper, cumin seeds, and unpeeled garlic cloves in a mortar and pestle.",
+        "In a pot, mash tomatoes with turmeric, salt, and 500ml water. Bring to a boil and cook for 8 minutes until tomatoes break down.",
+        "Add the freshly crushed pepper-cumin-garlic spice blend. Lower heat immediately to prevent aromatics from burning and simmer gently for 3 minutes until frothy.",
+        "In a small ladle or pan, heat oil, splutter mustard seeds, and pour into the rasam.",
+        "Turn off the heat immediately. Garnish with fresh coriander leaves and serve as a warming restorative soup or with hot rice."
+      ],
+      "nutrition_per_serving": {
+        "calories": 72,
+        "protein": 2.1,
+        "carbs": 8.4,
+        "fat": 3.7,
+        "fibre": 2.2
+      },
+      "molecular_profile": {
+        "dominant_aroma": "piperine + allicin + cuminaldehyde + citric acid",
+        "coherence_score": 0.97,
+        "notes": "High acidity from tomatoes activates the pungent piperine receptor, stimulating digestive salivary enzymes."
+      }
+    },
+    {
+      "recipe_id": "rec_011",
+      "title": "Masala Chai (Spiced Indian Milk Tea)",
+      "cuisine": "Indian Beverage",
+      "diet": "vegetarian",
+      "prep_time_minutes": 3,
+      "cook_time_minutes": 8,
+      "total_time_minutes": 11,
+      "servings": 2,
+      "image_url": "https://images.unsplash.com/photo-1576092768241-dec231879fc3?auto=format&fit=crop&w=800&q=80",
+      "core_ingredients": ["cardamom", "ginger", "cloves", "cinnamon"],
+      "ingredients": [
+        {"name": "tea leaves", "quantity": 10, "unit": "g"},
+        {"name": "milk", "quantity": 200, "unit": "ml"},
+        {"name": "ginger", "quantity": 15, "unit": "g"},
+        {"name": "cardamom", "quantity": 4, "unit": "pods"},
+        {"name": "cloves", "quantity": 3, "unit": "pieces"},
+        {"name": "cinnamon", "quantity": 2, "unit": "g"},
+        {"name": "black pepper", "quantity": 1, "unit": "g"}
+      ],
+      "utensils": ["saucepan", "strainer", "cups"],
+      "instructions": [
+        "Crush ginger, cardamom pods, cloves, and black peppercorns in a mortar.",
+        "Bring 200ml water to a boil with the crushed whole spices for 3 minutes so their essential oils extract into the water.",
+        "Add strong black tea leaves and simmer for 2 minutes until deep amber in color.",
+        "Add milk and bring to a frothy boil over medium heat. Allow it to rise, lower heat, and repeat twice for rich body.",
+        "Strain hot spiced chai into cutting glasses or cups."
+      ],
+      "nutrition_per_serving": {
+        "calories": 95,
+        "protein": 3.6,
+        "carbs": 8.2,
+        "fat": 4.8,
+        "fibre": 0.5
+      },
+      "molecular_profile": {
+        "dominant_aroma": "eugenol + 1,8-cineole + cinnamaldehyde",
+        "coherence_score": 0.99,
+        "notes": "Classic whole spice quartet sharing volatile phenols and eugenol compounds."
+      }
+    },
+    {
+      "recipe_id": "rec_012",
+      "title": "South Indian Sambar (Tangy Lentil & Veg Stew)",
+      "cuisine": "South Indian",
+      "diet": "vegan",
+      "prep_time_minutes": 15,
+      "cook_time_minutes": 25,
+      "total_time_minutes": 40,
+      "servings": 4,
+      "image_url": "https://images.unsplash.com/photo-1589301760014-d929f3979dbc?auto=format&fit=crop&w=800&q=80",
+      "core_ingredients": ["lentils", "mustard seeds", "turmeric", "coriander"],
+      "ingredients": [
+        {"name": "lentils", "quantity": 150, "unit": "g"},
+        {"name": "onion", "quantity": 100, "unit": "g"},
+        {"name": "tomato", "quantity": 120, "unit": "g"},
+        {"name": "mustard seeds", "quantity": 4, "unit": "g"},
+        {"name": "cumin", "quantity": 4, "unit": "g"},
+        {"name": "coriander", "quantity": 6, "unit": "g"},
+        {"name": "turmeric", "quantity": 3, "unit": "g"},
+        {"name": "red chilli", "quantity": 4, "unit": "g"},
+        {"name": "oil", "quantity": 15, "unit": "ml"},
+        {"name": "salt", "quantity": 6, "unit": "g"}
+      ],
+      "utensils": ["pot", "pan", "ladle"],
+      "instructions": [
+        "Cook lentils with turmeric until completely soft; whisk until creamy.",
+        "Cook sliced onions and chopped tomatoes in 2 cups of water with red chilli powder, coriander powder, and salt until vegetables are tender.",
+        "Add the cooked whisked lentils and simmer on medium heat for 10 minutes.",
+        "Heat oil in a small pan, crackle mustard seeds and cumin seeds.",
+        "Pour sizzling tempering into the bubbling sambar, cover immediately to trap the aroma, and rest 5 minutes before serving with idli, dosa, or rice."
+      ],
+      "nutrition_per_serving": {
+        "calories": 175,
+        "protein": 8.9,
+        "carbs": 26.5,
+        "fat": 4.1,
+        "fibre": 6.8
+      },
+      "molecular_profile": {
+        "dominant_aroma": "allyl isothiocyanate + linalool + curcumin",
+        "coherence_score": 0.93,
+        "notes": "Mustard seed pungency balances the earthiness of dal and sweetness of shallots."
+      }
+    }
+  ]
+}

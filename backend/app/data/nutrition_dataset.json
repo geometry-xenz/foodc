@@ -1,0 +1,400 @@
+{
+  "ingredients": {
+    "turmeric": {
+      "name": "Turmeric powder",
+      "per_100g": {
+        "calories": 312,
+        "protein": 7.8,
+        "carbs": 64.9,
+        "fat": 3.2,
+        "fibre": 21.1,
+        "sugar": 3.2,
+        "sodium_mg": 38,
+        "saturated_fat": 1.8,
+        "iron_mg": 41.4,
+        "calcium_mg": 182,
+        "vitamin_c_mg": 25.9,
+        "vitamin_a_iu": 0
+      },
+      "typical_serving_g": 5
+    },
+    "cumin": {
+      "name": "Cumin seeds",
+      "per_100g": {
+        "calories": 375,
+        "protein": 17.8,
+        "carbs": 44.2,
+        "fat": 22.3,
+        "fibre": 10.5,
+        "sugar": 2.2,
+        "sodium_mg": 168,
+        "saturated_fat": 1.5,
+        "iron_mg": 66.4,
+        "calcium_mg": 931,
+        "vitamin_c_mg": 7.7,
+        "vitamin_a_iu": 1270
+      },
+      "typical_serving_g": 6
+    },
+    "black pepper": {
+      "name": "Black pepper powder",
+      "per_100g": {
+        "calories": 251,
+        "protein": 10.4,
+        "carbs": 64.0,
+        "fat": 3.3,
+        "fibre": 25.3,
+        "sugar": 0.6,
+        "sodium_mg": 20,
+        "saturated_fat": 1.4,
+        "iron_mg": 9.7,
+        "calcium_mg": 443,
+        "vitamin_c_mg": 0,
+        "vitamin_a_iu": 547
+      },
+      "typical_serving_g": 3
+    },
+    "red chilli": {
+      "name": "Red chilli powder",
+      "per_100g": {
+        "calories": 282,
+        "protein": 13.4,
+        "carbs": 49.7,
+        "fat": 14.3,
+        "fibre": 34.8,
+        "sugar": 7.2,
+        "sodium_mg": 1640,
+        "saturated_fat": 2.5,
+        "iron_mg": 17.3,
+        "calcium_mg": 330,
+        "vitamin_c_mg": 76.4,
+        "vitamin_a_iu": 29650
+      },
+      "typical_serving_g": 4
+    },
+    "coriander": {
+      "name": "Coriander powder",
+      "per_100g": {
+        "calories": 298,
+        "protein": 12.4,
+        "carbs": 54.9,
+        "fat": 17.8,
+        "fibre": 41.9,
+        "sugar": 0.0,
+        "sodium_mg": 35,
+        "saturated_fat": 1.0,
+        "iron_mg": 16.3,
+        "calcium_mg": 709,
+        "vitamin_c_mg": 21.0,
+        "vitamin_a_iu": 0
+      },
+      "typical_serving_g": 5
+    },
+    "garlic": {
+      "name": "Fresh garlic cloves",
+      "per_100g": {
+        "calories": 149,
+        "protein": 6.4,
+        "carbs": 33.1,
+        "fat": 0.5,
+        "fibre": 2.1,
+        "sugar": 1.0,
+        "sodium_mg": 17,
+        "saturated_fat": 0.1,
+        "iron_mg": 1.7,
+        "calcium_mg": 181,
+        "vitamin_c_mg": 31.2,
+        "vitamin_a_iu": 9
+      },
+      "typical_serving_g": 15
+    },
+    "ginger": {
+      "name": "Fresh ginger root",
+      "per_100g": {
+        "calories": 80,
+        "protein": 1.8,
+        "carbs": 17.8,
+        "fat": 0.8,
+        "fibre": 2.0,
+        "sugar": 1.7,
+        "sodium_mg": 13,
+        "saturated_fat": 0.2,
+        "iron_mg": 0.6,
+        "calcium_mg": 16,
+        "vitamin_c_mg": 5.0,
+        "vitamin_a_iu": 0
+      },
+      "typical_serving_g": 15
+    },
+    "onion": {
+      "name": "Yellow / Red onion",
+      "per_100g": {
+        "calories": 40,
+        "protein": 1.1,
+        "carbs": 9.3,
+        "fat": 0.1,
+        "fibre": 1.7,
+        "sugar": 4.2,
+        "sodium_mg": 4,
+        "saturated_fat": 0.04,
+        "iron_mg": 0.2,
+        "calcium_mg": 23,
+        "vitamin_c_mg": 7.4,
+        "vitamin_a_iu": 2
+      },
+      "typical_serving_g": 120
+    },
+    "tomato": {
+      "name": "Ripe tomato",
+      "per_100g": {
+        "calories": 18,
+        "protein": 0.9,
+        "carbs": 3.9,
+        "fat": 0.2,
+        "fibre": 1.2,
+        "sugar": 2.6,
+        "sodium_mg": 5,
+        "saturated_fat": 0.03,
+        "iron_mg": 0.3,
+        "calcium_mg": 10,
+        "vitamin_c_mg": 13.7,
+        "vitamin_a_iu": 833
+      },
+      "typical_serving_g": 150
+    },
+    "paneer": {
+      "name": "Indian Cottage Cheese (Paneer)",
+      "per_100g": {
+        "calories": 296,
+        "protein": 18.3,
+        "carbs": 4.5,
+        "fat": 23.2,
+        "fibre": 0.0,
+        "sugar": 2.7,
+        "sodium_mg": 22,
+        "saturated_fat": 14.8,
+        "iron_mg": 0.7,
+        "calcium_mg": 680,
+        "vitamin_c_mg": 0,
+        "vitamin_a_iu": 750
+      },
+      "typical_serving_g": 100
+    },
+    "lentils": {
+      "name": "Yellow Toor Dal / Red Lentils (Cooked)",
+      "per_100g": {
+        "calories": 116,
+        "protein": 9.0,
+        "carbs": 20.1,
+        "fat": 0.4,
+        "fibre": 7.9,
+        "sugar": 1.8,
+        "sodium_mg": 2,
+        "saturated_fat": 0.1,
+        "iron_mg": 3.3,
+        "calcium_mg": 19,
+        "vitamin_c_mg": 1.5,
+        "vitamin_a_iu": 8
+      },
+      "typical_serving_g": 150
+    },
+    "rice": {
+      "name": "Basmati Rice (Cooked)",
+      "per_100g": {
+        "calories": 130,
+        "protein": 2.7,
+        "carbs": 28.2,
+        "fat": 0.3,
+        "fibre": 0.4,
+        "sugar": 0.1,
+        "sodium_mg": 1,
+        "saturated_fat": 0.1,
+        "iron_mg": 1.2,
+        "calcium_mg": 10,
+        "vitamin_c_mg": 0,
+        "vitamin_a_iu": 0
+      },
+      "typical_serving_g": 180
+    },
+    "chickpeas": {
+      "name": "Kabuli Chana / Chickpeas (Cooked)",
+      "per_100g": {
+        "calories": 164,
+        "protein": 8.9,
+        "carbs": 27.4,
+        "fat": 2.6,
+        "fibre": 7.6,
+        "sugar": 4.8,
+        "sodium_mg": 7,
+        "saturated_fat": 0.3,
+        "iron_mg": 2.9,
+        "calcium_mg": 49,
+        "vitamin_c_mg": 1.3,
+        "vitamin_a_iu": 26
+      },
+      "typical_serving_g": 150
+    },
+    "spinach": {
+      "name": "Fresh Spinach (Palak)",
+      "per_100g": {
+        "calories": 23,
+        "protein": 2.9,
+        "carbs": 3.6,
+        "fat": 0.4,
+        "fibre": 2.2,
+        "sugar": 0.4,
+        "sodium_mg": 79,
+        "saturated_fat": 0.1,
+        "iron_mg": 2.7,
+        "calcium_mg": 99,
+        "vitamin_c_mg": 28.1,
+        "vitamin_a_iu": 9376
+      },
+      "typical_serving_g": 100
+    },
+    "chicken": {
+      "name": "Skinless Chicken Breast",
+      "per_100g": {
+        "calories": 165,
+        "protein": 31.0,
+        "carbs": 0.0,
+        "fat": 3.6,
+        "fibre": 0.0,
+        "sugar": 0.0,
+        "sodium_mg": 74,
+        "saturated_fat": 1.0,
+        "iron_mg": 1.0,
+        "calcium_mg": 15,
+        "vitamin_c_mg": 0,
+        "vitamin_a_iu": 42
+      },
+      "typical_serving_g": 150
+    },
+    "eggs": {
+      "name": "Whole Fresh Eggs",
+      "per_100g": {
+        "calories": 143,
+        "protein": 12.6,
+        "carbs": 0.7,
+        "fat": 9.5,
+        "fibre": 0.0,
+        "sugar": 0.4,
+        "sodium_mg": 142,
+        "saturated_fat": 3.1,
+        "iron_mg": 1.8,
+        "calcium_mg": 56,
+        "vitamin_c_mg": 0,
+        "vitamin_a_iu": 540
+      },
+      "typical_serving_g": 100
+    },
+    "mustard seeds": {
+      "name": "Black / Brown Mustard Seeds",
+      "per_100g": {
+        "calories": 508,
+        "protein": 26.1,
+        "carbs": 28.1,
+        "fat": 36.2,
+        "fibre": 12.2,
+        "sugar": 6.8,
+        "sodium_mg": 13,
+        "saturated_fat": 2.0,
+        "iron_mg": 9.2,
+        "calcium_mg": 266,
+        "vitamin_c_mg": 7.1,
+        "vitamin_a_iu": 31
+      },
+      "typical_serving_g": 5
+    },
+    "cloves": {
+      "name": "Whole Cloves (Laung)",
+      "per_100g": {
+        "calories": 274,
+        "protein": 6.0,
+        "carbs": 65.5,
+        "fat": 13.0,
+        "fibre": 33.9,
+        "sugar": 2.4,
+        "sodium_mg": 277,
+        "saturated_fat": 4.0,
+        "iron_mg": 11.8,
+        "calcium_mg": 632,
+        "vitamin_c_mg": 0.2,
+        "vitamin_a_iu": 160
+      },
+      "typical_serving_g": 2
+    },
+    "cardamom": {
+      "name": "Green Cardamom Pods (Elaichi)",
+      "per_100g": {
+        "calories": 311,
+        "protein": 10.8,
+        "carbs": 68.5,
+        "fat": 6.7,
+        "fibre": 28.0,
+        "sugar": 0.0,
+        "sodium_mg": 18,
+        "saturated_fat": 0.7,
+        "iron_mg": 14.0,
+        "calcium_mg": 383,
+        "vitamin_c_mg": 21.0,
+        "vitamin_a_iu": 0
+      },
+      "typical_serving_g": 2
+    },
+    "cinnamon": {
+      "name": "Ceylon / Cassia Cinnamon Stick",
+      "per_100g": {
+        "calories": 247,
+        "protein": 4.0,
+        "carbs": 80.6,
+        "fat": 1.2,
+        "fibre": 53.1,
+        "sugar": 2.2,
+        "sodium_mg": 10,
+        "saturated_fat": 0.3,
+        "iron_mg": 8.3,
+        "calcium_mg": 1002,
+        "vitamin_c_mg": 3.8,
+        "vitamin_a_iu": 295
+      },
+      "typical_serving_g": 3
+    },
+    "salt": {
+      "name": "Table / Sea Salt",
+      "per_100g": {
+        "calories": 0,
+        "protein": 0.0,
+        "carbs": 0.0,
+        "fat": 0.0,
+        "fibre": 0.0,
+        "sugar": 0.0,
+        "sodium_mg": 38758,
+        "saturated_fat": 0.0,
+        "iron_mg": 0.3,
+        "calcium_mg": 24,
+        "vitamin_c_mg": 0,
+        "vitamin_a_iu": 0
+      },
+      "typical_serving_g": 4
+    },
+    "oil": {
+      "name": "Vegetable / Mustard / Ghee",
+      "per_100g": {
+        "calories": 884,
+        "protein": 0.0,
+        "carbs": 0.0,
+        "fat": 100.0,
+        "fibre": 0.0,
+        "sugar": 0.0,
+        "sodium_mg": 0,
+        "saturated_fat": 14.0,
+        "iron_mg": 0.0,
+        "calcium_mg": 0,
+        "vitamin_c_mg": 0,
+        "vitamin_a_iu": 0
+      },
+      "typical_serving_g": 15
+    }
+  }
+}

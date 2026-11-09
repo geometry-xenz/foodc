@@ -1,0 +1,26 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.pytest_cache/
+venv/
+env/
+ENV/
+
+# Database & local runtime
+drishyam.db
+*.sqlite3
+*.log
+
+# Environment variables
+.env
+.env.local
+
+# Node / Frontend
+node_modules/
+.DS_Store
+
+# Temporary archives
+drishyam_source_code.zip
+test_screenshots/
