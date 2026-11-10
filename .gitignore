@@ -10,6 +10,8 @@ ENV/
 
 # Database & local runtime
 drishyam.db
+prisma/dev.db
+prisma/dev.db-journal
 *.sqlite3
 *.log
 
@@ -17,9 +19,15 @@ drishyam.db
 .env
 .env.local
 
-# Node / Frontend
+# Node / Next.js
 node_modules/
+.next/
+next-env.d.ts
+*.tsbuildinfo
 .DS_Store
+
+# Generated verification artifacts
+screenshots/
 
 # Temporary archives
 drishyam_source_code.zip

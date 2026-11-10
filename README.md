@@ -1,123 +1,215 @@
-# DRISHYAM — AI-Powered Computational Gastronomy & Personalized Nutrition Platform
+# DRISHYAM — Computational Gastronomy & Personalised Nutrition
 
-> **"See your ingredients. Discover your possibilities."**  
-> *"Your kitchen, understood. Your nutrition, decoded."*
+> **“See your ingredients. Discover your possibilities.”**
 
----
+DRISHYAM is a production-ready computational gastronomy platform. It reads the
+volatile chemistry of a real pantry, ranks what can be cooked right now, and
+translates every recommendation into metabolic targets derived from the user’s
+own biology.
 
-## 1. Project Overview
+The experience ships as two connected surfaces:
 
-**DRISHYAM** is an AI-powered computational gastronomy and personalized nutrition intelligence platform. It bridges molecular culinary science, chemical volatile aroma pairing, real-world pantry inventory management, and metabolic health targets into a unified system.
-
-Powered by **Foodoscope RecipeDB** and **FlavorDB**, DRISHYAM enables users to:
-1. Understand what they can actually cook with the ingredients on their kitchen counter.
-2. Experience molecular aroma synergies (e.g. why turmeric and black pepper, or cumin and coriander, pair harmoniously).
-3. Personalize recipe recommendations based on evidence-based fitness goals (Fat Loss, Lean Bulk, Traditional Bulk, Dirty Bulk, Maintenance, Recomposition, General Health, Athletic Performance).
-4. Strictly filter allergens (Peanuts, Tree nuts, Dairy, Eggs, Soy, Gluten, Shellfish) as hard gates.
-5. Track daily macronutrient distributions (protein, carbs, fat, fibre) and analyze ingredient-level nutritional contributions.
-6. Discover the **"Unlock Suggestion"** — the single missing ingredient that unlocks the most recipes with the highest molecular flavor affinity.
+- A cinematic 3D landing page with a scroll-scrubbed film, an 800-particle
+  Three.js field, and five pinned storytelling scenes.
+- A responsive authenticated workspace with Dashboard, Pantry, Recipes,
+  Nutrition and Planner views.
 
 ---
 
-## 2. Cinematic Video & Keyframe Assets
+## Stack
 
-- **Cinematic Homepage Video:** `foodoscope.mp4` (`WhatsApp Video 2026-11-10 at 00.01.23.mp4`, 1280x720, 24fps, H.264). Synchronized with user scroll progress via **GSAP ScrollTrigger** and layered with **Three.js** ambient molecular particle clouds.
-- **Four Cinematic Keyframes:** Located in `public/images/keyframes/`:
-  - `scene1_ingredient_universe.png`: Section 1 — "Every ingredient has a story" (Ingredient Intelligence)
-  - `scene2_ai_recognition.png`: Section 2 — "Everything you have. One intelligent pantry" (Intelligent Pantry)
-  - `scene3_molecular_science.png`: Section 3 — "Cooking meets chemistry" (Molecular Flavour Science & FlavorDB graph)
-  - `scene4_recipe_nutrition.png`: Section 4 & 5 — "Discover what you can actually cook" & "Know what goes onto your plate" (Nutrition Intelligence)
-
----
-
-## 3. Computational Gastronomy Formula
-
-DRISHYAM ranks recipes using the validated computational gastronomy formula:
-
-$$\text{Gastronomy Score} = 0.30 \times \text{Core Coverage} + 0.20 \times \text{Counter Utilisation} + 0.20 \times \text{Flavour Coherence} + 0.30 \times \text{Gap Fit}$$
-
-- **Core Coverage (30%):** Ensures essential dish-defining ingredients (e.g. lentils in Dal Tadka, paneer in Tikka) are present so complex dishes aren't unfairly penalized.
-- **Counter Utilisation (20%):** Rewards recipes that consume what is sitting on the user's counter, actively minimizing kitchen food waste.
-- **Flavour Coherence (20%):** Computes shared volatile aroma compounds between pantry items using FlavorDB.
-- **Gap Fit (30%):** Measures ease and accessibility of missing items (excluding basic staples like salt, water, and oil).
-- **Nutritional Goal Multiplier:** Amplifies recipes matching the user's active fitness target (e.g., protein density bonus for fat loss and lean bulk).
+| Layer | Technology |
+| --- | --- |
+| Framework | Next.js 16.4 (App Router, Turbopack), React 19 |
+| Language | TypeScript 5.9 |
+| Styling | Tailwind CSS v4, custom glass/gold design system |
+| 3D / motion | Three.js, GSAP + ScrollTrigger |
+| Data | Prisma 6 + SQLite |
+| Auth | bcrypt password hashing, HTTP-only JWT session cookie (`jose`) |
+| UI primitives | Radix Dialog, Lucide icons, local Fontsource fonts |
 
 ---
 
-## 4. Architecture & Technology Stack
+## Quick Start
 
-```text
-foodc/
-├── backend/
-│   └── app/
-│       ├── main.py              # FastAPI application & SPA mounting
-│       ├── config.py            # Environment configuration
-│       ├── database.py          # SQLAlchemy engine & sessionmaker
-│       ├── core/security.py     # Password hashing & JWT auth
-│       ├── models/user.py       # SQLAlchemy ORM models
-│       ├── routes/              # Auth, Profile, Pantry, Recipes, Nutrition, etc.
-│       ├── services/            # Recipedb, Flavordb, Gastronomy, Nutrition, Goal calculator
-│       └── data/                # Resilient offline datasets (20+ authentic recipes, FlavorDB profiles)
-├── frontend/
-│   ├── src/
-│   │   ├── views/               # LandingView, AppView, AuthModal, OnboardingModal
-│   │   ├── three/               # Hero particle scene & FlavorDB 2D/3D canvas network
-│   │   ├── video/               # GSAP ScrollTrigger video scrubber
-│   │   ├── services/            # API client & local stores
-│   │   ├── styles/              # Design system variables, landing, and application CSS
-│   │   ├── router.js            # Client-side router (/ and /app)
-│   │   └── main.js              # Application entrypoint
-│   └── dist/                    # Production Vite build
-├── public/                      # Static video and keyframe images
-├── tests/                       # Automated backend tests (pytest)
-└── requirements.txt
-```
-
----
-
-## 5. Getting Started
-
-### Prerequisites
-- Python 3.10+
-- Node.js 18+ and npm
-
-### Installation
 ```bash
-# 1. Clone repository and navigate to directory
 cd /home/suman/personal/foodc
 
-# 2. Set up Python virtual environment
-python3 -m venv venv
-./venv/bin/pip install -r requirements.txt
-
-# 3. Build frontend assets
-cd frontend
 npm install
+
+# Create the local database and seed all real datasets
+npx prisma db push
+npm run db:seed
+
+# Development
+npm run dev          # http://localhost:3000
+
+# Production preview
 npm run build
-cd ..
+npm run start
 ```
 
-### Running the Application
-```bash
-# Start the unified DRISHYAM production server (port 8000)
-./venv/bin/uvicorn backend.app.main:app --host 0.0.0.0 --port 8000 --reload
+The `.env` file only needs:
+
+```dotenv
+DATABASE_URL="file:./dev.db"
+JWT_SECRET="change_me_in_production"
 ```
 
-Once running, open your browser at:
-- **Website & Experience:** `http://localhost:8000/`
-- **Application Workspace:** `http://localhost:8000/app`
-- **Interactive API Documentation:** `http://localhost:8000/docs`
+### Demo Account
 
-### Instant Demo Sign-In
-To explore the application without manual registration, click **"⚡ Instant Demo Sign In"** in the auth modal or sign in with:
 - **Email:** `demo@drishyam.ai`
 - **Password:** `drishyam2026`
 
+Or use **Instant demo kitchen** on the login page. The demo account is fully
+seeded with a pantry, a profile, three planned meals, and a Lean Bulk protocol.
+
+**Live preview in this workspace:** `http://localhost:3100`
+
 ---
 
-## 6. Testing
-To run the automated test suite:
-```bash
-PYTHONPATH=. ./venv/bin/pytest tests/
+## What Is Real
+
+Everything numeric flows through the engine. There are no static score lists.
+
+- **27** Indian ingredients with nutrition profiles, aliases, flavour descriptors
+  and volatile compound mappings.
+- **12** molecularly profiled recipes with per-serving macros, instructions and
+  pairing notes.
+- **100** ingredient ↔ volatile compound links across **65** unique compounds.
+- **6** evidence-based goal protocols.
+- Demo pantry of **14** items, three assigned meals, and a computed **3,230 kcal**
+  Lean Bulk target for the 74 kg / 178 cm / 26 y active demo profile.
+
+### Composite recipe score
+
 ```
-All tests verify authentication, profile and goal calculation, pantry CRUD, recipe ranking with hard allergy gates, FlavorDB substitutions, and nutritional calculations.
+0.30 × core coverage
++ 0.20 × pantry utilisation
++ 0.20 × flavour coherence
++ 0.30 × gap fit
+```
+
+The score is then personalised by goal (protein density, calorie fit, fibre fit).
+Scoring is implemented once in `lib/gastronomy.ts` and reused by the dashboard,
+recipes, planner and APIs.
+
+### Molecular coherence
+
+`lib/flavor.ts` normalises aliases (`Haldi Powder → turmeric`, `Jeera → cumin`),
+resolves FlavorDB entities, and scores pairwise coherence with Jaccard overlap
+plus documented culinary synergy bridges. It is deterministic and bounded.
+
+### Metabolic engine
+
+`lib/goals.ts` ports Mifflin-St Jeor exactly:
+
+```
+male:   BMR = 10w + 6.25h − 5a + 5
+female: BMR = 10w + 6.25h − 5a − 161
+TDEE = BMR × activity multiplier
+```
+
+Goal protocols then adjust energy and macros. Protein is anchored per kilogram;
+fat or carbohydrate absorbs the remaining energy. Recomposition is isocaloric;
+Athletic Performance is exactly 55% carbohydrate energy.
+
+### One-Ingredient Unlock
+
+`lib/gastronomy.ts` only recommends an ingredient when it is the **single hard
+missing item** for one or more recipes and has a positive molecular pairing.
+Results are ranked by dishes unlocked, then pairwise affinity.
+
+---
+
+## Routes
+
+| Route | Surface |
+| --- | --- |
+| `/` | Cinematic landing experience |
+| `/login` | Sign in / register / instant demo |
+| `/app` | Dashboard: pantry signals, ranked dishes, unlock, day totals |
+| `/app/pantry` | Inventory CRUD, vision-ingest simulation, aroma overlap |
+| `/app/recipes` | Scored recipe grid, filters, detail modal, unlock hero |
+| `/app/nutrition` | Live biometrics form, BMR/TDEE, macro ledger, goal protocols |
+| `/app/planner` | Day view, meal assignment, macro balance, totals |
+
+### API
+
+```
+POST /api/auth/login | /register | /demo | /logout
+GET  /api/auth/me
+GET/POST /api/pantry          PATCH/DELETE /api/pantry/[id]
+GET  /api/recipes             GET /api/recipes/[id]
+GET/POST /api/nutrition/targets
+POST /api/nutrition/analyze
+GET/POST /api/planner         DELETE /api/planner/[id]
+```
+
+All non-auth routes require the session cookie and scope every query to the
+signed-in user.
+
+---
+
+## Project Layout
+
+```text
+app/                     Next.js routes, layouts and API handlers
+components/
+  app/                   Dashboard, pantry, recipes, nutrition, planner UI
+  scenes/                Three.js / canvas landing scenes
+  ui/                    Shared primitives
+lib/
+  gastronomy.ts          Composite scoring, personalisation, unlock engine
+  flavor.ts              Normalisation, FlavorDB entities, coherence
+  goals.ts               Mifflin-St Jeor, TDEE, six protocols
+  nutrition.ts           Unit conversion and macro analysis
+  data-access.ts         User-scoped server queries
+  data/                  recipes.json, flavordb.json, nutrition.json
+prisma/
+  schema.prisma          User, Profile, PantryItem, Recipe, Ingredient,
+                         FlavorCompound, IngredientCompound, Goal, MealPlanEntry
+  seed.ts                Fully deterministic seed
+scripts/
+  verify-engines.ts      Math and engine assertions
+  verify-visual.py       Multi-viewport Playwright verification
+backend/ frontend/       Archived FastAPI + Vite implementation (reference only)
+```
+
+---
+
+## Verification
+
+```bash
+# 15 deterministic engine assertions
+npm run verify:engines
+
+# Type checking / production build
+npx tsc --noEmit
+npm run build
+
+# Desktop, tablet and mobile screenshots + runtime checks
+npm run verify:visual
+```
+
+`verify:visual` logs in with the demo account, visits every workspace route,
+opens the recipe detail and planner assignment dialogs, checks for console/page
+errors, and asserts there is no horizontal overflow at 1440×900, 834×1112 or
+390×844. Screenshots and `report.json` land in `screenshots/`.
+
+The script auto-detects a Playwright Chromium build under
+`~/.cache/ms-playwright`; set `CHROMIUM_PATH` to override.
+
+---
+
+## Design System
+
+Deep-black `#080808`, saffron `#FF8A32`, gold `#E8B56A`, cream `#F6EFE4`.
+Glass pills, hairline gold borders, Cormorant Garamond display type, Manrope UI
+type, custom scrollbar, film grain, preloader and magnetic buttons.
+
+Motion respects `prefers-reduced-motion`: the hero video freezes on a frame,
+particles render statically, and scroll reveals are disabled.
+
+The archived `backend/` and `frontend/` directories are preserved for audit and
+comparison; the active application is the Next.js project at the repository root.
