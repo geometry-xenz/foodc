@@ -1,6 +1,7 @@
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
+    alias(libs.plugins.kotlin.serialization)
 }
 
 android {
@@ -64,6 +65,15 @@ dependencies {
     // Feature modules
     implementation(project(":feature:dashboard"))
     implementation(project(":feature:scanner"))
+
+    // Architecture & Storage
+    implementation(libs.room.runtime)
+    implementation(libs.room.ktx)
+    implementation(libs.retrofit)
+    implementation(libs.retrofit.kotlinx.serialization)
+    implementation(libs.okhttp)
+    implementation(libs.okhttp.logging)
+    implementation(libs.kotlinx.serialization.json)
 
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)

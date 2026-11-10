@@ -27,6 +27,7 @@ dependencies {
     implementation(project(":core:network"))
     implementation(project(":domain"))
 
+    implementation(libs.retrofit)
     implementation(libs.kotlinx.coroutines.android)
     implementation(libs.room.runtime)
     implementation(libs.room.ktx)

@@ -29,6 +29,9 @@ next-env.d.ts
 # Generated verification artifacts
 screenshots/
 
-# Temporary archives
-drishyam_source_code.zip
-test_screenshots/
+# Android build outputs & local caches
+.gradle/
+**/build/
+.idea/
+local.properties
+*.apk
