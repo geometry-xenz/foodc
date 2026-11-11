@@ -1,116 +1,156 @@
-import logging
-from typing import Dict, Any
+"""
+Goal and metabolic calculation engine.
+Adheres to DRISHYAM Master Specification §5.7 and §8.
+Implements Mifflin-St Jeor formula, TDEE, 8 fitness protocols, and strict safety bounds.
+"""
+from typing import Any, Dict, List, Optional, Tuple
 
-logger = logging.getLogger(__name__)
 
-ACTIVITY_MULTIPLIERS = {
-    "sedentary": 1.2,
-    "light": 1.375,
-    "moderate": 1.55,
-    "active": 1.725,
-    "very_active": 1.9
-}
+def calculate_bmr(gender: str, weight_kg: float, height_cm: float, age: int) -> float:
+    """Mifflin-St Jeor BMR equation."""
+    base = 10.0 * weight_kg + 6.25 * height_cm - 5.0 * age
+    if gender.lower() == "male":
+        return round(base + 5.0, 1)
+    else:  # female, non_binary default to female baseline for safety
+        return round(base - 161.0, 1)
 
-def calculate_bmr(weight_kg: float, height_cm: float, age: int, sex: str = "male") -> float:
-    """
-    Calculates Basal Metabolic Rate using the validated Mifflin-St Jeor equation.
-    """
-    if str(sex).lower() == "female":
-        bmr = (10.0 * weight_kg) + (6.25 * height_cm) - (5.0 * age) - 161.0
-    else:
-        bmr = (10.0 * weight_kg) + (6.25 * height_cm) - (5.0 * age) + 5.0
-    return round(bmr, 1)
 
-def calculate_tdee(bmr: float, activity_level: str = "moderate") -> float:
-    """
-    Calculates Total Daily Energy Expenditure (TDEE).
-    """
-    mult = ACTIVITY_MULTIPLIERS.get(activity_level.lower(), 1.55)
-    return round(bmr * mult, 1)
+def calculate_tdee(bmr: float, activity_level: str) -> float:
+    """TDEE using standard PAL multipliers."""
+    multipliers = {
+        "sedentary": 1.2,
+        "light": 1.375,
+        "moderate": 1.55,
+        "active": 1.725,
+        "very_active": 1.9,
+    }
+    multiplier = multipliers.get(activity_level.lower(), 1.55)
+    return round(bmr * multiplier, 1)
 
-def compute_nutrition_targets(
+
+def calculate_macro_targets(
+    gender: str,
     weight_kg: float,
     height_cm: float,
     age: int,
-    sex: str = "male",
-    activity_level: str = "moderate",
-    primary_goal: str = "lean_bulk"
+    activity_level: str,
+    goal: str,
+    overrides: Optional[Dict[str, float]] = None
 ) -> Dict[str, Any]:
     """
-    Computes personalized daily calorie and macronutrient targets based on user physical metrics and specific fitness goal.
+    Computes precise metabolic targets across the 8 supported protocols.
+    Enforces safety bounds and returns calculation audit trail.
     """
-    bmr = calculate_bmr(weight_kg, height_cm, age, sex)
+    bmr = calculate_bmr(gender, weight_kg, height_cm, age)
     tdee = calculate_tdee(bmr, activity_level)
 
-    goal = str(primary_goal).lower()
-    
-    # Target calorie adjustments
-    if goal == "fat_loss":
-        target_calories = max(tdee - 500, 1300)
-        protein_per_kg = 2.2
-        fat_pct = 0.25
-        fibre_target = 35.0
-        rationale = "Controlled 500 kcal deficit with high protein to maximize fat oxidation while preserving lean mass."
-    elif goal == "lean_bulk":
-        target_calories = tdee + 250
-        protein_per_kg = 2.0
-        fat_pct = 0.25
-        fibre_target = 35.0
-        rationale = "Modest 250 kcal surplus supporting progressive muscle protein synthesis with minimal adipose gain."
-    elif goal == "traditional_bulk":
-        target_calories = tdee + 500
-        protein_per_kg = 1.8
-        fat_pct = 0.28
-        fibre_target = 30.0
-        rationale = "Robust 500 kcal surplus maximizing glycogen replenishment and strength adaptation."
-    elif goal == "dirty_bulk":
-        target_calories = tdee + 750
-        protein_per_kg = 1.6
-        fat_pct = 0.32
-        fibre_target = 25.0
-        rationale = "High calorie surplus prioritizing rapid mass gain. Note: Higher rate of fat deposition expected."
-    elif goal == "recomposition":
-        target_calories = tdee - 100
-        protein_per_kg = 2.3
-        fat_pct = 0.25
-        fibre_target = 35.0
-        rationale = "Near-isocaloric intake with elevated protein to stimulate muscle synthesis during subtle fat loss."
-    elif goal == "athletic_performance":
-        target_calories = tdee + 200
-        protein_per_kg = 1.8
-        fat_pct = 0.22
-        fibre_target = 35.0
-        rationale = "Carbohydrate-dense fueling strategy to sustain high glycogen turnover and rapid recovery."
-    else: # maintenance or general_health
+    # Floor boundaries
+    gender_floor = 1500.0 if gender.lower() == "male" else 1200.0
+    absolute_calorie_floor = max(bmr, gender_floor)
+
+    warnings: List[str] = []
+    goal_key = goal.lower().strip()
+
+    # Protocol definitions
+    if goal_key == "fat_loss":
+        # -20% deficit, high protein to preserve LBM
+        target_calories = tdee * 0.80
+        protein_g = weight_kg * 2.2
+        fat_g = max(35.0, (target_calories * 0.25) / 9.0)
+        remaining_kcal = target_calories - (protein_g * 4.0 + fat_g * 9.0)
+        carbs_g = max(50.0, remaining_kcal / 4.0)
+
+    elif goal_key == "lean_bulk":
+        # +10% slight surplus, hyper-lean growth
+        target_calories = tdee * 1.10
+        protein_g = weight_kg * 2.0
+        fat_g = (target_calories * 0.25) / 9.0
+        remaining_kcal = target_calories - (protein_g * 4.0 + fat_g * 9.0)
+        carbs_g = max(100.0, remaining_kcal / 4.0)
+
+    elif goal_key == "bulk":
+        # +15% moderate surplus
+        target_calories = tdee * 1.15
+        protein_g = weight_kg * 1.9
+        fat_g = (target_calories * 0.28) / 9.0
+        remaining_kcal = target_calories - (protein_g * 4.0 + fat_g * 9.0)
+        carbs_g = max(150.0, remaining_kcal / 4.0)
+
+    elif goal_key == "dirty_bulk":
+        # +25% aggressive surplus with explicit trade-off advisory
+        target_calories = tdee * 1.25
+        protein_g = weight_kg * 1.8
+        fat_g = (target_calories * 0.32) / 9.0
+        remaining_kcal = target_calories - (protein_g * 4.0 + fat_g * 9.0)
+        carbs_g = max(200.0, remaining_kcal / 4.0)
+        warnings.append(
+            "Dirty bulk protocol carries higher adipose accumulation trade-offs. "
+            "Monitor blood biomarkers and arterial elasticity."
+        )
+
+    elif goal_key == "recomposition":
+        # -5% mild deficit / near-maintenance, peak protein
+        target_calories = tdee * 0.95
+        protein_g = weight_kg * 2.3
+        fat_g = (target_calories * 0.25) / 9.0
+        remaining_kcal = target_calories - (protein_g * 4.0 + fat_g * 9.0)
+        carbs_g = max(80.0, remaining_kcal / 4.0)
+
+    elif goal_key == "athletic_performance":
+        # +5% performance fueling, high carbohydrate bias
+        target_calories = tdee * 1.05
+        protein_g = weight_kg * 1.8
+        carbs_g = weight_kg * 5.5  # glycogen replenishment
+        remaining_kcal = target_calories - (protein_g * 4.0 + carbs_g * 4.0)
+        fat_g = max(40.0, remaining_kcal / 9.0)
+
+    elif goal_key == "general_health":
+        # Equilibrium, balanced macros: 50% carbs, 25% protein, 25% fat
         target_calories = tdee
-        protein_per_kg = 1.6
-        fat_pct = 0.28
-        fibre_target = 32.0
-        rationale = "Energy balance formula supporting metabolic homeostasis, longevity and balanced macronutrient distribution."
+        protein_g = (target_calories * 0.25) / 4.0
+        fat_g = (target_calories * 0.25) / 9.0
+        carbs_g = (target_calories * 0.50) / 4.0
 
-    target_protein_g = round(weight_kg * protein_per_kg, 1)
-    protein_calories = target_protein_g * 4.0
+    else:  # maintenance
+        target_calories = tdee
+        protein_g = weight_kg * 1.7
+        fat_g = (target_calories * 0.28) / 9.0
+        remaining_kcal = target_calories - (protein_g * 4.0 + fat_g * 9.0)
+        carbs_g = max(100.0, remaining_kcal / 4.0)
 
-    fat_calories = target_calories * fat_pct
-    target_fat_g = round(fat_calories / 9.0, 1)
+    # Enforce minimum calorie floor safety bounds
+    if target_calories < absolute_calorie_floor:
+        warnings.append(
+            f"Calculated intake ({round(target_calories)} kcal) was below safety threshold "
+            f"({round(absolute_calorie_floor)} kcal). Adjusted to biological minimum."
+        )
+        target_calories = absolute_calorie_floor
 
-    carb_calories = max(target_calories - protein_calories - fat_calories, 0)
-    target_carbs_g = round(carb_calories / 4.0, 1)
+    # Handle user manual overrides if provided
+    is_override = False
+    if overrides:
+        is_override = True
+        if "calories" in overrides:
+            val = float(overrides["calories"])
+            if val < absolute_calorie_floor:
+                warnings.append(f"Manual calorie override ({val} kcal) is below recommended metabolic floor ({round(absolute_calorie_floor)} kcal).")
+            target_calories = val
+        if "protein_g" in overrides:
+            protein_g = float(overrides["protein_g"])
+        if "carbs_g" in overrides:
+            carbs_g = float(overrides["carbs_g"])
+        if "fat_g" in overrides:
+            fat_g = float(overrides["fat_g"])
 
     return {
-        "bmr": bmr,
-        "tdee": tdee,
-        "primary_goal": goal,
-        "target_calories": round(target_calories, 0),
-        "target_protein_g": target_protein_g,
-        "target_carbs_g": target_carbs_g,
-        "target_fat_g": target_fat_g,
-        "target_fibre_g": fibre_target,
-        "macro_distribution_pct": {
-            "protein": round((protein_calories / target_calories) * 100, 1),
-            "carbs": round((carb_calories / target_calories) * 100, 1),
-            "fat": round((fat_calories / target_calories) * 100, 1)
-        },
-        "rationale": rationale,
-        "disclaimer": "All nutritional calculations are evidence-based estimates based on standard metabolic equations."
+        "bmr_kcal": round(bmr),
+        "tdee_kcal": round(tdee),
+        "target_calories_kcal": round(target_calories),
+        "target_protein_g": round(protein_g, 1),
+        "target_carbs_g": round(carbs_g, 1),
+        "target_fat_g": round(fat_g, 1),
+        "target_fiber_g": 30.0,
+        "is_override": is_override,
+        "warnings": warnings,
+        "provenance": "calculated",
     }

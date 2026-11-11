@@ -10,7 +10,7 @@ import {
   NutritionDashboardScene,
   PantryTelemetryScene,
 } from "@/components/scenes/telemetry-nutrition-scenes";
-import { AromaNetwork } from "@/components/scenes/aroma-network";
+import { FlavourGraph } from "@/components/three/flavour-graph";
 import { LandingFooter } from "@/components/landing-footer";
 
 export function LandingExperience({
@@ -93,25 +93,7 @@ export function LandingExperience({
           description="Force-directed springs connect ingredients to their volatile compounds. Hover any node to expose the chemistry behind the pairing — and see which single molecules bridge your entire pantry."
           stacked
         >
-          <AromaNetwork />
-          <div className="mt-4 grid grid-cols-2 gap-3 sm:grid-cols-4">
-            {[
-              { value: "24", label: "Live graph nodes" },
-              { value: "22", label: "Spring edges" },
-              { value: "3", label: "Shared volatiles" },
-              { value: String(compoundCount), label: "Compound links in ontology" },
-            ].map((stat) => (
-              <div
-                key={stat.label}
-                className="rounded-xl border border-[rgba(232,181,106,.11)] bg-[rgba(255,255,255,.015)] px-4 py-3"
-              >
-                <div className="font-display text-2xl text-[#F3D3A1]">{stat.value}</div>
-                <div className="mt-1 text-[0.48rem] uppercase tracking-[0.14em] text-[#6F665B]">
-                  {stat.label}
-                </div>
-              </div>
-            ))}
-          </div>
+          <FlavourGraph />
         </SceneShell>
 
         <SceneShell

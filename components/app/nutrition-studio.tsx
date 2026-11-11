@@ -19,7 +19,7 @@ import {
   GOAL_ORDER,
   GOAL_SPECS,
   computeNutritionTargets,
-} from "@/lib/goals";
+} from "@/lib/types";
 import type { ActivityLevel, GoalId, NutritionTargets } from "@/lib/types";
 import { cn, formatNumber } from "@/lib/utils";
 import { ConsumptionRings } from "@/components/app/consumption-rings";

@@ -1,215 +1,159 @@
-# DRISHYAM — Computational Gastronomy & Personalised Nutrition
+# DRISHYAM — Computational Gastronomy & Personalized Nutrition Ecosystem
 
 > **“See your ingredients. Discover your possibilities.”**
 
-DRISHYAM is a production-ready computational gastronomy platform. It reads the
-volatile chemistry of a real pantry, ranks what can be cooked right now, and
-translates every recommendation into metabolic targets derived from the user’s
-own biology.
-
-The experience ships as two connected surfaces:
-
-- A cinematic 3D landing page with a scroll-scrubbed film, an 800-particle
-  Three.js field, and five pinned storytelling scenes.
-- A responsive authenticated workspace with Dashboard, Pantry, Recipes,
-  Nutrition and Planner views.
+DRISHYAM is a production-grade, cross-platform computational gastronomy and metabolic nutrition ecosystem. It pairs real-time on-device computer vision on Android with a shared computational gastronomy engine (FlavorDB & Foodoscope) and an authenticated Next.js web application.
 
 ---
 
-## Stack
+## 1. System Architecture & Components
 
-| Layer | Technology |
-| --- | --- |
-| Framework | Next.js 16.4 (App Router, Turbopack), React 19 |
-| Language | TypeScript 5.9 |
-| Styling | Tailwind CSS v4, custom glass/gold design system |
-| 3D / motion | Three.js, GSAP + ScrollTrigger |
-| Data | Prisma 6 + SQLite |
-| Auth | bcrypt password hashing, HTTP-only JWT session cookie (`jose`) |
-| UI primitives | Radix Dialog, Lucide icons, local Fontsource fonts |
+```
++-------------------------------------------------------------------------+
+|                                DRISHYAM                                 |
++-------------------------------------------------------------------------+
+       |                                                    |
+       v                                                    v
++-------------------------------+          +-------------------------------+
+|     Android Native Client     |          |       Next.js Web Client      |
+|  - Jetpack Compose            |          |  - App Router / React 19      |
+|  - CameraX + LiteRT (TFLite)  |          |  - Three.js + GSAP Motion     |
+|  - Offline Room + Outbox      |          |  - Tailored Dashboards        |
+|  - TokenAuthenticator (Retry) |          |  - httpOnly Secure Session    |
++-------------------------------+          +-------------------------------+
+       |                                                    |
+       |  REST / HTTPS                                      |  REST / HTTPS
+       |  Authorization: Bearer                             |  Cookie: drishyam_session
+       v                                                    v
++-------------------------------------------------------------------------+
+|                  FastAPI Authoritative Backend (:8000)                  |
+|  - Auth & Session Service (scrypt + SHA-256)                            |
+|  - Offline Sync & Tombstone Delta Engine (§5.5)                         |
+|  - Computational Gastronomy & FlavorDB Pairing Graph (§5.6)             |
+|  - Nutritional BMR/TDEE Clamped Calculator (§5.7)                       |
+|  - Ephemeral Deep Inspect Cloud Vision Analyzer (§21)                   |
++-------------------------------------------------------------------------+
+                                    |
+                                    v
++-------------------------------------------------------------------------+
+|                     PostgreSQL Relational Storage                       |
+|  - users, auth_sessions, user_profiles, user_settings                   |
+|  - pantry_items, sync_ops, shopping_items, meal_logs, meal_plans        |
+|  - ingredients, ingredient_aliases, recipes, flavour_compounds          |
++-------------------------------------------------------------------------+
+```
 
 ---
 
-## Quick Start
+## 2. Core Principles & Constraints
 
+- **Single Authoritative Backend:** One asynchronous Python (FastAPI + PostgreSQL) backend powers both the Next.js web app and Android native app.
+- **Strict Multi-Tenant Isolation:** Complete database separation between user accounts.
+- **Zero Fake Fallbacks (§26):**
+  - **No camera on web:** Camera scanning is reserved exclusively for the native Android client (§3.1).
+  - **No hallucinated detections:** If real camera inputs or models are unavailable, zero detections are emitted.
+  - **Explicit provenance badging:** Every data point displays its exact source (`android_scanner`, `usda_foundation`, `calculated_mifflin_st_jeor`, or `manual`).
+- **Offline-First Synchronization (§5.5):** Mutations are queued locally in SQLite (Room) with UUID `op_id`s. On reconnect, duplicate operations return idempotent duplicate confirmations, and concurrent conflicts resolve in favor of the authoritative server state.
+
+---
+
+## 3. Technology Stack
+
+| Layer | Technologies |
+|---|---|
+| **Authoritative Backend** | Python 3.11+, FastAPI, SQLAlchemy 2.0 (`asyncpg` / `psycopg`), Pydantic v2 |
+| **Relational Database** | PostgreSQL 15+, Alembic migrations |
+| **Web Application** | Next.js 16 (App Router), React 19, TypeScript, Tailwind CSS v4 |
+| **Web 3D & Kinetic Motion** | Three.js 0.180, GSAP 3.15 + ScrollTrigger, Cormorant Garamond / Manrope |
+| **Native Android Client** | Kotlin 1.9+, Jetpack Compose, CameraX, Room 2.6, Retrofit 2.11, WorkManager |
+| **On-Device Edge Vision** | TensorFlow Lite (LiteRT) 2.16+, ML Kit OCR, EfficientNet-Lite, EfficientDet-Lite |
+| **Reverse Proxy & Ops** | Caddy 2 (automatic HTTPS), Docker & Docker Compose |
+
+---
+
+## 4. Quick Start & Execution
+
+### 4.1 Prerequisites
+- PostgreSQL running locally or via Docker.
+- Python 3.11+ with virtual environment tools.
+- Node.js 20+ and npm.
+- Java Development Kit (JDK 21) and Android SDK 34+.
+
+### 4.2 Start FastAPI Backend
 ```bash
-cd /home/suman/personal/foodc
+cd backend
+python -m venv .venv
+source .venv/bin/activate
+pip install -r requirements.txt
 
+# Run migrations and start server
+alembic upgrade head
+uvicorn app.main:app --host 127.0.0.1 --port 8000
+```
+*API docs available at: `http://localhost:8000/docs`*
+
+### 4.3 Start Next.js Web Application
+```bash
 npm install
-
-# Create the local database and seed all real datasets
-npx prisma db push
-npm run db:seed
-
-# Development
-npm run dev          # http://localhost:3000
-
-# Production preview
 npm run build
-npm run start
+npm run start -- -p 3100
 ```
+*Web dashboard available at: `http://localhost:3100`*
 
-The `.env` file only needs:
-
-```dotenv
-DATABASE_URL="file:./dev.db"
-JWT_SECRET="change_me_in_production"
-```
-
-### Demo Account
-
-- **Email:** `demo@drishyam.ai`
-- **Password:** `drishyam2026`
-
-Or use **Instant demo kitchen** on the login page. The demo account is fully
-seeded with a pantry, a profile, three planned meals, and a Lean Bulk protocol.
-
-**Live preview in this workspace:** `http://localhost:3100`
-
----
-
-## What Is Real
-
-Everything numeric flows through the engine. There are no static score lists.
-
-- **27** Indian ingredients with nutrition profiles, aliases, flavour descriptors
-  and volatile compound mappings.
-- **12** molecularly profiled recipes with per-serving macros, instructions and
-  pairing notes.
-- **100** ingredient ↔ volatile compound links across **65** unique compounds.
-- **6** evidence-based goal protocols.
-- Demo pantry of **14** items, three assigned meals, and a computed **3,230 kcal**
-  Lean Bulk target for the 74 kg / 178 cm / 26 y active demo profile.
-
-### Composite recipe score
-
-```
-0.30 × core coverage
-+ 0.20 × pantry utilisation
-+ 0.20 × flavour coherence
-+ 0.30 × gap fit
-```
-
-The score is then personalised by goal (protein density, calorie fit, fibre fit).
-Scoring is implemented once in `lib/gastronomy.ts` and reused by the dashboard,
-recipes, planner and APIs.
-
-### Molecular coherence
-
-`lib/flavor.ts` normalises aliases (`Haldi Powder → turmeric`, `Jeera → cumin`),
-resolves FlavorDB entities, and scores pairwise coherence with Jaccard overlap
-plus documented culinary synergy bridges. It is deterministic and bounded.
-
-### Metabolic engine
-
-`lib/goals.ts` ports Mifflin-St Jeor exactly:
-
-```
-male:   BMR = 10w + 6.25h − 5a + 5
-female: BMR = 10w + 6.25h − 5a − 161
-TDEE = BMR × activity multiplier
-```
-
-Goal protocols then adjust energy and macros. Protein is anchored per kilogram;
-fat or carbohydrate absorbs the remaining energy. Recomposition is isocaloric;
-Athletic Performance is exactly 55% carbohydrate energy.
-
-### One-Ingredient Unlock
-
-`lib/gastronomy.ts` only recommends an ingredient when it is the **single hard
-missing item** for one or more recipes and has a positive molecular pairing.
-Results are ranked by dishes unlocked, then pairwise affinity.
-
----
-
-## Routes
-
-| Route | Surface |
-| --- | --- |
-| `/` | Cinematic landing experience |
-| `/login` | Sign in / register / instant demo |
-| `/app` | Dashboard: pantry signals, ranked dishes, unlock, day totals |
-| `/app/pantry` | Inventory CRUD, vision-ingest simulation, aroma overlap |
-| `/app/recipes` | Scored recipe grid, filters, detail modal, unlock hero |
-| `/app/nutrition` | Live biometrics form, BMR/TDEE, macro ledger, goal protocols |
-| `/app/planner` | Day view, meal assignment, macro balance, totals |
-
-### API
-
-```
-POST /api/auth/login | /register | /demo | /logout
-GET  /api/auth/me
-GET/POST /api/pantry          PATCH/DELETE /api/pantry/[id]
-GET  /api/recipes             GET /api/recipes/[id]
-GET/POST /api/nutrition/targets
-POST /api/nutrition/analyze
-GET/POST /api/planner         DELETE /api/planner/[id]
-```
-
-All non-auth routes require the session cookie and scope every query to the
-signed-in user.
-
----
-
-## Project Layout
-
-```text
-app/                     Next.js routes, layouts and API handlers
-components/
-  app/                   Dashboard, pantry, recipes, nutrition, planner UI
-  scenes/                Three.js / canvas landing scenes
-  ui/                    Shared primitives
-lib/
-  gastronomy.ts          Composite scoring, personalisation, unlock engine
-  flavor.ts              Normalisation, FlavorDB entities, coherence
-  goals.ts               Mifflin-St Jeor, TDEE, six protocols
-  nutrition.ts           Unit conversion and macro analysis
-  data-access.ts         User-scoped server queries
-  data/                  recipes.json, flavordb.json, nutrition.json
-prisma/
-  schema.prisma          User, Profile, PantryItem, Recipe, Ingredient,
-                         FlavorCompound, IngredientCompound, Goal, MealPlanEntry
-  seed.ts                Fully deterministic seed
-scripts/
-  verify-engines.ts      Math and engine assertions
-  verify-visual.py       Multi-viewport Playwright verification
-backend/ frontend/       Archived FastAPI + Vite implementation (reference only)
-```
-
----
-
-## Verification
-
+### 4.4 Build Android Native App
 ```bash
-# 15 deterministic engine assertions
-npm run verify:engines
-
-# Type checking / production build
-npx tsc --noEmit
-npm run build
-
-# Desktop, tablet and mobile screenshots + runtime checks
-npm run verify:visual
+cd android
+./gradlew assembleDebug
 ```
-
-`verify:visual` logs in with the demo account, visits every workspace route,
-opens the recipe detail and planner assignment dialogs, checks for console/page
-errors, and asserts there is no horizontal overflow at 1440×900, 834×1112 or
-390×844. Screenshots and `report.json` land in `screenshots/`.
-
-The script auto-detects a Playwright Chromium build under
-`~/.cache/ms-playwright`; set `CHROMIUM_PATH` to override.
+*Debug APK generated at: `android/app/build/outputs/apk/debug/app-debug.apk`*
 
 ---
 
-## Design System
+## 5. Automated Verification & Testing
 
-Deep-black `#080808`, saffron `#FF8A32`, gold `#E8B56A`, cream `#F6EFE4`.
-Glass pills, hairline gold borders, Cormorant Garamond display type, Manrope UI
-type, custom scrollbar, film grain, preloader and magnetic buttons.
+### 5.1 Cross-Platform End-to-End Test Suite (S15)
+Exercises all 6 end-to-end integration scenarios against the live FastAPI backend:
+```bash
+python scripts/verify-cross-platform.py
+```
+- **Scenario 1:** Cross-platform registration and login (Web $\leftrightarrow$ Android).
+- **Scenario 2:** Android scanner push $\to$ Web inventory inspection $\to$ Web edit $\to$ Android delta sync.
+- **Scenario 3:** Offline outbox batch push with idempotent replay detection.
+- **Scenario 4:** Stale `base_version` concurrent conflict handling (server authoritative).
+- **Scenario 5:** Multi-tenant data isolation and cross-tenant edit rejection (HTTP 404).
+- **Scenario 6:** Complete account deletion cascading and session token revocation.
 
-Motion respects `prefers-reduced-motion`: the hero video freezes on a frame,
-particles render statically, and scroll reveals are disabled.
+### 5.2 Android Unit Test Suites
+```bash
+cd android
+./gradlew testDebugUnitTest
+```
+- Tests 401 synchronized token refresh with automatic single retry (`TokenAuthenticatorTest`).
+- Tests offline-first sync contracts and Room outbox operations (`SyncAndContractTest`).
+- Tests scanner persistence, 1000ms stability gating, and 0.75 confidence thresholds (`ScannerPipelineTest`).
 
-The archived `backend/` and `frontend/` directories are preserved for audit and
-comparison; the active application is the Next.js project at the repository root.
+---
+
+## 6. Demo & Evaluation Walkthrough
+
+- **One-Click Demo Access:** Click **"Explore with Demo Account"** on the web or mobile login screens.
+- **Pre-seeded Credentials:**
+  - **Email:** `demo@drishyam.ai`
+  - **Password:** `drishyam2026`
+- **Showcase API:** `GET /api/public/showcase` provides real engine statistics, recipe rankings across 3 fitness goals, and sample molecular aroma network graphs with zero mock data.
+
+---
+
+## 7. Documentation Index
+
+- [Architecture & Decisions D1–D11](file:///home/suman/personal/foodc/docs/architecture.md)
+- [REST API Specification](file:///home/suman/personal/foodc/docs/api.md)
+- [Database Schema & ER Diagram](file:///home/suman/personal/foodc/docs/database.md)
+- [Offline-First Sync Protocol](file:///home/suman/personal/foodc/docs/sync.md)
+- [Kinetic Design & Motion System](file:///home/suman/personal/foodc/docs/motion.md)
+- [Android Client Guide & Architecture](file:///home/suman/personal/foodc/docs/android.md)
+- [Edge Vision Scanner & Model Card](file:///home/suman/personal/foodc/docs/scanner.md)
+- [Production Deployment & Docker](file:///home/suman/personal/foodc/docs/deployment.md)
+- [Demo Mode & Tour Walkthrough](file:///home/suman/personal/foodc/docs/demo-mode.md)
+- [System Limitations & Boundaries](file:///home/suman/personal/foodc/docs/limitations.md)
+- [Third-Party Model Licences](file:///home/suman/personal/foodc/third_party_models.yaml)

@@ -14,7 +14,7 @@ import {
   Trash2,
   X,
 } from "lucide-react";
-import type { PantryDto } from "@/lib/serializers";
+import type { PantryDto } from "@/lib/types";
 
 type CatalogItem = {
   name: string;
@@ -54,8 +54,6 @@ export function PantryManager({
   const [unit, setUnit] = useState("g");
   const [busy, setBusy] = useState<string | null>(null);
   const [message, setMessage] = useState<{ type: "ok" | "error"; text: string } | null>(null);
-  const [scanning, setScanning] = useState(false);
-  const [detected, setDetected] = useState<CatalogItem | null>(null);
 
   const catalogByName = useMemo(
     () => new Map(catalog.map((item) => [item.name, item])),
@@ -191,29 +189,6 @@ export function PantryManager({
     }
   }
 
-  async function simulateDetection() {
-    if (suggestions.length === 0) {
-      setMessage({ type: "ok", text: "All catalog ingredients are already in your pantry." });
-      return;
-    }
-    setScanning(true);
-    setDetected(null);
-    await new Promise((resolve) => setTimeout(resolve, 1450));
-    const item = suggestions[Math.floor(Math.random() * suggestions.length)];
-    const confidence = 0.91 + Math.floor(Math.random() * 8) / 100;
-    setDetected(item);
-    setScanning(false);
-    await addItem({
-      name: item.name,
-      category: item.category,
-      quantity: 50,
-      unit: "g",
-      source: "vision",
-      confidence,
-    });
-    setTimeout(() => setDetected(null), 2400);
-  }
-
   return (
     <div className="space-y-5">
       <header className="flex flex-col justify-between gap-4 sm:flex-row sm:items-end">
@@ -227,10 +202,6 @@ export function PantryManager({
             adjust stock — recipe scores recalculate instantly.
           </p>
         </div>
-        <button type="button" onClick={simulateDetection} disabled={scanning} className="btn btn-gold btn-sm">
-          {scanning ? <Loader2 size={13} className="animate-spin" /> : <ScanEye size={13} />}
-          {scanning ? "Scanning" : "Detection ingest"}
-        </button>
       </header>
 
       <section className="grid grid-cols-2 gap-3 lg:grid-cols-4">
@@ -331,44 +302,22 @@ export function PantryManager({
               <div className="flex items-center gap-2">
                 <ScanEye size={14} className="text-[#FF8A32]" />
                 <h2 className="text-[0.55rem] font-semibold uppercase tracking-[0.18em] text-[#D9C7AE]">
-                  Vision ingest
+                  Live Mobile Scanner
                 </h2>
               </div>
-              <span className="chip chip-sage !py-0.5 text-[0.44rem]">simulated</span>
+              <span className="chip chip-gold !py-0.5 text-[0.44rem]">Android</span>
             </div>
-            <div className="relative mt-3 grid h-[150px] place-items-center overflow-hidden rounded-xl border border-[rgba(232,181,106,.13)] bg-[radial-gradient(circle_at_50%_45%,rgba(255,138,50,.12),rgba(8,8,8,.9)_70%)]">
-              <div className="absolute h-24 w-24 rounded-full border border-[rgba(255,138,50,.3)]" />
-              <div className="absolute h-16 w-16 rounded-full border border-dashed border-[rgba(255,138,50,.22)] animate-[spin_9s_linear_infinite]" />
-              {scanning && <div className="scan-line" />}
-              <div className="relative text-center">
-                <div className="font-display text-[2rem] leading-none text-[#F3D3A1]">
-                  {detected ? detected.displayName : scanning ? "…" : "Ready"}
-                </div>
-                <div className="mt-1 text-[0.44rem] uppercase tracking-[0.16em] text-[#756D62]">
-                  {detected
-                    ? `Confidence ${(0.91 + (detected.name.length % 8) / 100).toFixed(2)} · added`
-                    : scanning
-                      ? "Reading spectral signature"
-                      : "Stage an ingredient frame"}
-                </div>
+            <div className="mt-3 rounded-xl border border-[rgba(232,181,106,.13)] bg-[rgba(8,8,8,.6)] p-3 text-center">
+              <div className="font-display text-[1.1rem] leading-snug text-[#F3D3A1]">
+                On-device Computer Vision
               </div>
-              {detected && (
-                <div className="absolute inset-4 hud-box hud-corner">
-                  <div className="absolute -top-[22px] left-0 bg-[rgba(8,8,8,.7)] px-1.5 py-0.5 text-[0.44rem] uppercase tracking-[0.12em] text-[#FFD2A8]">
-                    {detected.displayName}
-                  </div>
-                </div>
-              )}
+              <p className="mt-1.5 text-[0.62rem] leading-relaxed text-[#A99F91]">
+                Use the native DRISHYAM Android app to point your camera at spices, containers and pantry staples. Items recognized via OCR, local edge models, or Deep Inspect sync to your web inventory in real time.
+              </p>
             </div>
-            <p className="mt-3 text-[0.58rem] leading-4 text-[#756D62]">
-              Adds a random unseen catalog ingredient with a vision-sourced
-              confidence score. The production detector maps to the same pantry
-              schema.
-            </p>
-            <button type="button" onClick={simulateDetection} disabled={scanning} className="btn btn-ghost btn-sm mt-3 w-full">
-              {scanning ? <Loader2 size={12} className="animate-spin" /> : <Sparkles size={12} />}
-              Run detection
-            </button>
+            <div className="mt-3 flex items-center justify-between text-[0.55rem] text-[#756D62]">
+              <span>Sources: Android Scanner · Manual · Deep Inspect</span>
+            </div>
           </section>
         </div>
 

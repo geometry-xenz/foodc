@@ -6,11 +6,11 @@ import { Menu, X, Sparkles } from "lucide-react";
 import { Logo } from "@/components/logo";
 
 const LINKS = [
-  { href: "#scene-1", label: "Ingredients" },
-  { href: "#scene-2", label: "Pantry" },
-  { href: "#scene-3", label: "Aroma" },
-  { href: "#scene-4", label: "Nutrition" },
-  { href: "#scene-5", label: "Goals" },
+  { href: "/features", label: "Discover" },
+  { href: "/how-it-works", label: "How it works" },
+  { href: "/flavour-science", label: "Flavour Science" },
+  { href: "/nutrition", label: "Nutrition" },
+  { href: "/about", label: "About" },
 ];
 
 export function LandingNav() {
@@ -58,7 +58,7 @@ export function LandingNav() {
             </Link>
             <Link href="/app" className="btn btn-gold btn-sm">
               <Sparkles size={13} />
-              Launch app
+              Launch DRISHYAM
             </Link>
           </div>
 

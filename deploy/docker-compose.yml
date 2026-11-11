@@ -1,0 +1,81 @@
+version: '3.8'
+
+services:
+  postgres:
+    image: postgres:15-alpine
+    container_name: drishyam_postgres
+    restart: always
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-drishyam}
+      POSTGRES_USER: ${POSTGRES_USER:-drishyam}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-drishyam_secure_password_2026}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-drishyam} -d ${POSTGRES_DB:-drishyam}"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    networks:
+      - drishyam_net
+
+  api:
+    build:
+      context: ../backend
+      dockerfile: Dockerfile
+    container_name: drishyam_api
+    restart: always
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      ENVIRONMENT: production
+      DATABASE_URL: postgresql+psycopg://${POSTGRES_USER:-drishyam}:${POSTGRES_PASSWORD:-drishyam_secure_password_2026}@postgres:5432/${POSTGRES_DB:-drishyam}
+      SECRET_KEY: ${SECRET_KEY:-drishyam_super_secret_gastronomy_key_2026}
+      FOODOSCOPE_API_KEY: ${FOODOSCOPE_API_KEY:-}
+      GEMINI_API_KEY: ${GEMINI_API_KEY:-}
+    networks:
+      - drishyam_net
+
+  web:
+    build:
+      context: ..
+      dockerfile: Dockerfile
+    container_name: drishyam_web
+    restart: always
+    depends_on:
+      - api
+    environment:
+      NODE_ENV: production
+      NEXT_PUBLIC_API_URL: http://api:8000
+    networks:
+      - drishyam_net
+
+  caddy:
+    image: caddy:2-alpine
+    container_name: drishyam_caddy
+    restart: always
+    depends_on:
+      - api
+      - web
+    ports:
+      - "80:80"
+      - "443:443"
+    environment:
+      CADDY_HOST: ${CADDY_HOST:-localhost}
+      ACME_EMAIL: ${ACME_EMAIL:-admin@drishyam.kitchen}
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile
+      - caddy_data:/data
+      - caddy_config:/config
+    networks:
+      - drishyam_net
+
+volumes:
+  postgres_data:
+  caddy_data:
+  caddy_config:
+
+networks:
+  drishyam_net:
+    driver: bridge

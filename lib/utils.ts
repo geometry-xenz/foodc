@@ -54,3 +54,11 @@ export function greeting() {
 export function pct(value: number) {
   return `${Math.round(value * 100)}%`;
 }
+
+export function displayName(name: string): string {
+  if (!name) return "";
+  return name
+    .split(/[_\s]+/)
+    .map((word) => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
+    .join(" ");
+}

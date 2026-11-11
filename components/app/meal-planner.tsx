@@ -17,6 +17,7 @@ import {
   Moon,
   Plus,
   Search,
+  ShoppingCart,
   Sparkles,
   Sun,
   Trash2,
@@ -93,6 +94,7 @@ export function MealPlanner({
   const [search, setSearch] = useState("");
   const [adding, setAdding] = useState<string | null>(null);
   const [removing, setRemoving] = useState<string | null>(null);
+  const [buildingShopping, setBuildingShopping] = useState(false);
   const [message, setMessage] = useState<{ type: "ok" | "error"; text: string } | null>(
     null,
   );
@@ -218,6 +220,39 @@ export function MealPlanner({
     }
   }
 
+  async function buildShoppingList() {
+    setBuildingShopping(true);
+    setMessage(null);
+    try {
+      const res = await fetch("/api/shopping/suggestions");
+      if (res.ok) {
+        const suggestions = await res.json();
+        let added = 0;
+        for (const item of suggestions) {
+          await fetch("/api/shopping/items", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              name: item.name,
+              quantity: item.quantity,
+              unit: item.unit,
+              reason: item.reason,
+            }),
+          });
+          added++;
+        }
+        setMessage({
+          type: "ok",
+          text: `Added ${added} missing ingredients from meal plan to your shopping list.`,
+        });
+      }
+    } catch {
+      setMessage({ type: "error", text: "Failed to generate shopping list." });
+    } finally {
+      setBuildingShopping(false);
+    }
+  }
+
   return (
     <div className="space-y-5">
       <header className="flex flex-col justify-between gap-4 sm:flex-row sm:items-end">
@@ -232,7 +267,20 @@ export function MealPlanner({
             and macros accumulate against your live {goalName.toLowerCase()} target.
           </p>
         </div>
-        <div className="flex flex-wrap gap-2">
+        <div className="flex flex-wrap items-center gap-2">
+          <button
+            type="button"
+            onClick={buildShoppingList}
+            disabled={buildingShopping}
+            className="btn btn-gold btn-sm"
+          >
+            {buildingShopping ? (
+              <Loader2 size={12} className="animate-spin" />
+            ) : (
+              <ShoppingCart size={12} />
+            )}
+            Build Shopping List
+          </button>
           <span className="chip chip-gold">
             <CalendarDays size={10} /> {dateLabel(date)}
           </span>

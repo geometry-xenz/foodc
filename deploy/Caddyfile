@@ -1,0 +1,30 @@
+{
+    email {$ACME_EMAIL:admin@drishyam.kitchen}
+}
+
+{$CADDY_HOST:localhost} {
+    encode gzip zstd
+
+    # Route backend REST and OpenAPI documentation
+    handle /api/* {
+        reverse_proxy api:8000
+    }
+    handle /docs* {
+        reverse_proxy api:8000
+    }
+    handle /openapi.json {
+        reverse_proxy api:8000
+    }
+
+    # Route Next.js web application
+    handle /* {
+        reverse_proxy web:3000
+    }
+
+    header {
+        Strict-Transport-Security "max-age=31536000; includeSubDomains; preload"
+        X-Content-Type-Options "nosniff"
+        X-Frame-Options "DENY"
+        Referrer-Policy "strict-origin-when-cross-origin"
+    }
+}

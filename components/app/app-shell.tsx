@@ -5,14 +5,19 @@ import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import {
   Activity,
+  Bookmark,
   CalendarDays,
   ChevronRight,
+  Clock,
   Home,
   LogOut,
   Menu,
   Package,
   Settings2,
+  ShoppingCart,
   Sparkles,
+  Target,
+  User,
   UtensilsCrossed,
   X,
 } from "lucide-react";
@@ -23,8 +28,15 @@ const NAV = [
   { href: "/app", label: "Dashboard", icon: Home, hint: "Kitchen overview" },
   { href: "/app/pantry", label: "Pantry", icon: Package, hint: "Detected stock" },
   { href: "/app/recipes", label: "Recipes", icon: UtensilsCrossed, hint: "Ranked matches" },
+  { href: "/app/meal-planner", label: "Meal Planner", icon: CalendarDays, hint: "Day protocol" },
   { href: "/app/nutrition", label: "Nutrition", icon: Activity, hint: "Metabolic targets" },
-  { href: "/app/planner", label: "Planner", icon: CalendarDays, hint: "Day protocol" },
+  { href: "/app/flavour", label: "Aroma Network", icon: Sparkles, hint: "3D molecular graph" },
+  { href: "/app/meal-history", label: "Meal History", icon: Clock, hint: "Historical intake" },
+  { href: "/app/shopping", label: "Shopping List", icon: ShoppingCart, hint: "Pantry deficits" },
+  { href: "/app/goals", label: "Goals & Biometrics", icon: Target, hint: "8 protocols" },
+  { href: "/app/saved", label: "Saved Recipes", icon: Bookmark, hint: "Cookbook" },
+  { href: "/app/profile", label: "Profile", icon: User, hint: "Personalization" },
+  { href: "/app/settings", label: "Settings", icon: Settings2, hint: "Device & security" },
 ] as const;
 
 export function AppShell({
@@ -277,7 +289,7 @@ export function AppShell({
 
       {/* Mobile dock */}
       <nav className="bottom-dock fixed inset-x-0 bottom-0 z-30 flex items-stretch justify-around md:hidden">
-        {NAV.map((item) => {
+        {NAV.slice(0, 5).map((item) => {
           const Icon = item.icon;
           const isActive =
             item.href === "/app"

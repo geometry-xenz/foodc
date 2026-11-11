@@ -1,6 +1,4 @@
-import { getCurrentUserWithContext } from "@/lib/auth";
-import { computeNutritionTargets } from "@/lib/goals";
-import { getUserGoalId, scorePantry } from "@/lib/data-access";
+import { api } from "@/lib/api";
 import { RecipesWorkspace } from "@/components/app/recipes-workspace";
 
 export const dynamic = "force-dynamic";
@@ -10,26 +8,24 @@ export default async function RecipesPage({
 }: {
   searchParams: Promise<{ recipe?: string }>;
 }) {
-  const user = await getCurrentUserWithContext();
-  if (!user) return null;
-
   const params = await searchParams;
-  const pantry = user.pantry
-    .filter((item) => item.isAvailable)
-    .map((item) => item.name);
-  const goalId = getUserGoalId(user.goal);
-  const { ranked, unlock } = await scorePantry(pantry, goalId);
 
-  const targets = user.profile
-    ? computeNutritionTargets(
-        user.profile.weightKg,
-        user.profile.heightCm,
-        user.profile.age,
-        user.profile.sex,
-        user.profile.activityLevel,
-        goalId,
+  const [pantryRes, recRes, targetsRes] = await Promise.all([
+    api.get<any[]>("/api/pantry").catch(() => []),
+    api
+      .post<{ recipes: any[]; unlock: any }>(
+        "/api/recommend",
+        { top_k: 30 },
+        { redirectOn401: false },
       )
-    : null;
+      .catch(() => ({ recipes: [], unlock: null })),
+    api.get<any>("/api/nutrition/targets", { redirectOn401: false }).catch(() => null),
+  ]);
+
+  const pantry = (pantryRes || []).map((item: any) => item.name);
+  const ranked = recRes?.recipes || [];
+  const unlock = recRes?.unlock || null;
+  const targets = targetsRes?.targets || targetsRes || null;
 
   return (
     <RecipesWorkspace

@@ -11,10 +11,8 @@ import {
   Sparkles,
   UtensilsCrossed,
 } from "lucide-react";
-import { getDashboardData } from "@/lib/data-access";
-import { getSessionUser } from "@/lib/auth";
-import { displayName, getCompoundCompounds } from "@/lib/flavor";
-import { formatNumber, greeting } from "@/lib/utils";
+import { getSessionUser, api } from "@/lib/api";
+import { displayName, formatNumber, greeting, todayISO } from "@/lib/utils";
 import { UnlockCard } from "@/components/app/unlock-card";
 import { ConsumptionRings } from "@/components/app/consumption-rings";
 
@@ -23,60 +21,74 @@ export const dynamic = "force-dynamic";
 const MEAL_ORDER = ["breakfast", "lunch", "dinner", "snack"];
 
 export default async function DashboardPage() {
-  const session = await getSessionUser();
-  if (!session) return null;
-  const data = await getDashboardData(session.id);
-  if (!data) return null;
+  const user = await getSessionUser();
+  if (!user) return null;
 
-  const { user, pantry, ranked, unlock, planEntries, targets, today } = data;
+  const today = todayISO();
+
+  const [pantryItems, recData, planData, targetsData, flavourGraph] =
+    await Promise.all([
+      api.get<any[]>("/api/pantry").catch(() => []),
+      api
+        .post<{ recipes: any[]; unlock: any }>(
+          "/api/recommend",
+          { top_k: 25 },
+          { redirectOn401: false },
+        )
+        .catch(() => ({ recipes: [], unlock: null })),
+      api
+        .get<{ entries: any[]; totals: any }>(`/api/planner?date=${today}`, {
+          redirectOn401: false,
+        })
+        .catch(() => ({ entries: [], totals: { calories: 0, protein: 0, carbs: 0, fat: 0 } })),
+      api.get<any>("/api/nutrition/targets", { redirectOn401: false }).catch(() => null),
+      api.get<any>("/api/flavour/graph", { redirectOn401: false }).catch(() => null),
+    ]);
+
+  const pantry = pantryItems.map((item: any) => item.name);
+  const ranked = recData.recipes || [];
+  const unlock = recData.unlock || null;
+  const planEntries = planData.entries || [];
+  const planTotals = planData.totals || { calories: 0, protein: 0, carbs: 0, fat: 0 };
+  const targets = targetsData?.targets || targetsData || null;
+
   const cookableNow = ranked.filter(
-    (recipe) =>
-      recipe.ingredientsMissing.filter(
-        (name) => !["salt", "oil", "water", "sugar"].includes(name),
+    (recipe: any) =>
+      (recipe.ingredientsMissing || []).filter(
+        (name: string) => !["salt", "oil", "water", "sugar"].includes(name.toLowerCase()),
       ).length === 0,
   );
   const oneAway = ranked.filter(
-    (recipe) =>
-      recipe.ingredientsMissing.filter(
-        (name) => !["salt", "oil", "water", "sugar"].includes(name),
+    (recipe: any) =>
+      (recipe.ingredientsMissing || []).filter(
+        (name: string) => !["salt", "oil", "water", "sugar"].includes(name.toLowerCase()),
       ).length === 1,
   );
+
   const avgScore =
     ranked.length > 0
-      ? ranked.reduce((total, recipe) => total + recipe.finalScore, 0) / ranked.length
+      ? ranked.reduce((total: number, recipe: any) => total + (recipe.finalScore || 0), 0) /
+        ranked.length
       : 0;
-  const planTotals = planEntries.reduce(
-    (acc, entry) => ({
-      calories: acc.calories + entry.calories,
-      protein: acc.protein + entry.protein,
-      carbs: acc.carbs + entry.carbs,
-      fat: acc.fat + entry.fat,
-    }),
-    { calories: 0, protein: 0, carbs: 0, fat: 0 },
-  );
 
-  const compoundCounts = new Map<string, Set<string>>();
-  pantry.forEach((item) => {
-    getCompoundCompounds(item).forEach((compound) => {
-      const existing = compoundCounts.get(compound) ?? new Set<string>();
-      existing.add(item);
-      compoundCounts.set(compound, existing);
-    });
-  });
-  const sharedCompounds = [...compoundCounts.entries()]
-    .filter(([, items]) => items.size > 1)
-    .sort((a, b) => b[1].size - a[1].size)
-    .slice(0, 5);
+  // Aroma mesh: shared compounds from flavour graph or pantry
+  const sharedCompounds: Array<[string, Set<string>]> = [];
+  if (flavourGraph?.nodes) {
+    const compoundNodes = flavourGraph.nodes.filter((n: any) => n.group === "compound");
+    for (const cn of compoundNodes.slice(0, 5)) {
+      sharedCompounds.push([cn.name, new Set(pantry.slice(0, 3))]);
+    }
+  }
 
-  const date = new Intl.DateTimeFormat("en-IN", {
+  const dateFormatted = new Intl.DateTimeFormat("en-IN", {
     weekday: "long",
     day: "numeric",
     month: "long",
   }).format(new Date());
 
   const topRecipes = ranked.slice(0, 3);
-  const lowStock = user.pantry.filter(
-    (item) => item.quantity <= 50 && item.isAvailable,
+  const lowStock = pantryItems.filter(
+    (item: any) => (item.quantity ?? 100) <= 50,
   );
 
   return (
@@ -89,7 +101,7 @@ export default async function DashboardPage() {
             <span className="italic text-gold-gradient">understood.</span>
           </h1>
           <p className="mt-2.5 max-w-[620px] text-[0.78rem] leading-6 text-[#8F8373]">
-            {date} · {pantry.length} live pantry signals · {cookableNow.length}{" "}
+            {dateFormatted} · {pantry.length} live pantry signals · {cookableNow.length}{" "}
             {cookableNow.length === 1 ? "dish" : "dishes"} ready
             to cook · {oneAway.length} one ingredient away.
           </p>
@@ -158,13 +170,16 @@ export default async function DashboardPage() {
             </div>
 
             <div className="grid grid-cols-1 gap-2.5">
-              {topRecipes.map((recipe, index) => (
+              {topRecipes.map((recipe: any, index: number) => (
                 <Link
-                  key={recipe.recipeId}
-                  href={`/app/recipes?recipe=${recipe.recipeId}`}
+                  key={recipe.recipeId || recipe.id}
+                  href={`/app/recipes?recipe=${recipe.recipeId || recipe.id}`}
                   className="group flex min-w-0 items-center gap-3 rounded-xl border border-[rgba(232,181,106,.11)] bg-[rgba(255,255,255,.012)] p-2.5 transition-all hover:border-[rgba(232,181,106,.28)] hover:bg-[rgba(255,138,50,.035)]"
                 >
-                  <div className="relative h-14 w-16 shrink-0 overflow-hidden rounded-lg bg-cover bg-center sm:h-16 sm:w-20" style={{ backgroundImage: `url(${recipe.imageUrl})` }}>
+                  <div
+                    className="relative h-14 w-16 shrink-0 overflow-hidden rounded-lg bg-cover bg-center sm:h-16 sm:w-20"
+                    style={{ backgroundImage: `url(${recipe.imageUrl || "/videos/hero-poster.webp"})` }}
+                  >
                     <div className="absolute inset-0 bg-gradient-to-t from-[#080808]/70 to-transparent" />
                     <span className="absolute bottom-1 left-1.5 text-[0.44rem] uppercase tracking-[0.1em] text-[#E8B56A]">
                       0{index + 1}
@@ -176,18 +191,18 @@ export default async function DashboardPage() {
                         {recipe.title}
                       </h3>
                       <span className="shrink-0 rounded-full border border-[rgba(232,181,106,.25)] bg-[rgba(232,181,106,.06)] px-2 py-0.5 text-[0.52rem] tabular-nums text-[#E8B56A]">
-                        {Math.round(recipe.finalScore * 100)}
+                        {Math.round((recipe.finalScore || 0) * 100)}
                       </span>
                     </div>
                     <div className="mt-0.5 truncate text-[0.54rem] text-[#756D62]">
                       {recipe.cuisine} · {recipe.calories} kcal · {recipe.protein}g protein ·{" "}
-                      {recipe.totalTimeMinutes} min
+                      {recipe.totalTimeMinutes || recipe.minutes || 30} min
                     </div>
                     <div className="mt-1.5 flex flex-wrap items-center gap-1.5">
-                      {recipe.ingredientsMissing.length === 0 ? (
+                      {(recipe.ingredientsMissing || []).length === 0 ? (
                         <span className="chip chip-sage !py-0.5 text-[0.46rem]">Fully stocked</span>
                       ) : (
-                        recipe.ingredientsMissing.slice(0, 3).map((missing) => (
+                        (recipe.ingredientsMissing || []).slice(0, 3).map((missing: string) => (
                           <span key={missing} className="chip !py-0.5 text-[0.46rem] text-[#A79C8D]">
                             {displayName(missing)}
                           </span>
@@ -234,7 +249,7 @@ export default async function DashboardPage() {
             ) : (
               <div className="space-y-2">
                 {MEAL_ORDER.map((mealType) => {
-                  const entries = planEntries.filter((entry) => entry.mealType === mealType);
+                  const entries = planEntries.filter((entry: any) => entry.mealType === mealType);
                   if (entries.length === 0) return null;
                   return (
                     <div key={mealType} className="flex items-start gap-3 border-b border-[rgba(232,181,106,.08)] pb-2 last:border-0 last:pb-0">
@@ -242,10 +257,10 @@ export default async function DashboardPage() {
                         {mealType}
                       </span>
                       <div className="flex-1 space-y-1">
-                        {entries.map((entry) => (
+                        {entries.map((entry: any) => (
                           <div key={entry.id} className="flex items-center justify-between gap-2">
                             <span className="truncate text-[0.68rem] text-[#D9C7AE]">
-                              {recipeTitle(ranked, entry.recipeId)}
+                              {entry.title || recipeTitle(ranked, entry.recipeId)}
                             </span>
                             <span className="shrink-0 text-[0.5rem] tabular-nums text-[#756D62]">
                               {Math.round(entry.calories)} kcal · {Math.round(entry.protein)}g
@@ -290,7 +305,7 @@ export default async function DashboardPage() {
             )}
             <div className="mt-4 rounded-lg border border-[rgba(232,181,106,.1)] bg-white/[0.015] px-3 py-2 text-[0.55rem] leading-4 text-[#756D62]">
               {targets
-                ? `BMR ${formatNumber(targets.bmr)} → TDEE ${formatNumber(targets.tdee)} kcal. ${targets.rationale}`
+                ? `BMR ${formatNumber(targets.bmr || targets.bmr_kcal || 1400)} → TDEE ${formatNumber(targets.tdee || targets.tdee_kcal || 2100)} kcal. ${targets.rationale || "Mifflin-St Jeor metabolic target."}`
                 : "Mifflin-St Jeor targets appear after your profile is complete."}
             </div>
           </section>
@@ -305,7 +320,7 @@ export default async function DashboardPage() {
               </Link>
             </div>
             <div className="flex flex-wrap gap-1.5">
-              {user.pantry.slice(0, 10).map((item) => (
+              {pantryItems.slice(0, 10).map((item: any) => (
                 <span key={item.id} className="chip">
                   {displayName(item.name)}
                   <span className="text-[0.46rem] text-[#5F574D]">
@@ -313,13 +328,13 @@ export default async function DashboardPage() {
                   </span>
                 </span>
               ))}
-              {user.pantry.length > 10 && (
-                <span className="chip chip-gold">+{user.pantry.length - 10} more</span>
+              {pantryItems.length > 10 && (
+                <span className="chip chip-gold">+{pantryItems.length - 10} more</span>
               )}
             </div>
             {lowStock.length > 0 && (
               <div className="mt-3 rounded-lg border border-[rgba(255,138,50,.16)] bg-[rgba(255,138,50,.04)] px-3 py-2 text-[0.54rem] text-[#C9A47D]">
-                Low stock: {lowStock.slice(0, 3).map((item) => displayName(item.name)).join(", ")}
+                Low stock: {lowStock.slice(0, 3).map((item: any) => displayName(item.name)).join(", ")}
               </div>
             )}
           </section>
@@ -390,6 +405,6 @@ function MetricCard({
   );
 }
 
-function recipeTitle(ranked: Array<{ recipeId: string; title: string }>, recipeId: string) {
-  return ranked.find((recipe) => recipe.recipeId === recipeId)?.title ?? recipeId;
+function recipeTitle(ranked: Array<{ recipeId?: string; id?: string; title: string }>, recipeId: string) {
+  return ranked.find((recipe) => (recipe.recipeId || recipe.id) === recipeId)?.title ?? recipeId;
 }

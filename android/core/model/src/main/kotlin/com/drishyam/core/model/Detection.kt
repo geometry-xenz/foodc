@@ -28,11 +28,3 @@ data class Detection(
     val durationVisibleMs: Long get() = lastSeenTimestamp - firstDetectedTimestamp
     val isStable: Boolean get() = confidence >= 0.75f && durationVisibleMs >= 1000L
 }
-
-@Serializable
-data class FlavorCompound(
-    val id: String,
-    val name: String,
-    val aromaProfile: String,
-    val sharedIngredients: List<String> = emptyList()
-)

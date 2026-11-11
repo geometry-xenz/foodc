@@ -1,103 +1,138 @@
-import io
+"""
+Deep Inspect vision service.
+Adheres to DRISHYAM Master Specification §4, §5.4, §21, and D7:
+- Requires explicit user consent.
+- Enforces closed culinary vocabulary.
+- Calls Gemini 2.0 Flash or OpenAI.
+- Returns 503 if no vision provider key is present. NEVER fakes a demo detection.
+"""
 import base64
+import json
 import logging
-from typing import Dict, Any, List
-from PIL import Image, ImageStat
+import re
+from typing import Any, Dict, List
 import httpx
+from app.config import get_settings
+from app.core.exceptions import AppException
 
-from backend.app.config import settings
+logger = logging.getLogger("drishyam.vision")
+settings = get_settings()
 
-logger = logging.getLogger(__name__)
+PROMPT = """You are DRISHYAM Kitchen Vision Inspector. Identify visible food ingredients or spices in this photo.
+Rules:
+- Only detect food items, whole spices, spice powders, or culinary ingredients.
+- Use canonical English names (e.g. "turmeric", "cumin", "clove", "tomato", "chilli powder", "salt").
+- Return strictly JSON format without markdown fences or additional prose:
+{"ingredients": [{"name": "turmeric", "confidence": 0.94}]}
+"""
 
-class VisionService:
-    def __init__(self):
-        self.gemini_key = settings.GEMINI_API_KEY
-        self.provider = settings.VISION_PROVIDER
 
-    async def analyze_image_bytes(self, image_bytes: bytes) -> Dict[str, Any]:
-        """
-        Deep Inspect: processes uploaded frame to identify ambiguous kitchen counter ingredients.
-        Uses Gemini 2.0 Flash VLM when API key is provided, or computational visual classifier fallback.
-        """
-        if self.gemini_key and not settings.OFFLINE_MODE:
-            try:
-                b64_image = base64.b64encode(image_bytes).decode("utf-8")
-                url = f"https://generativelanguage.googleapis.com/v1beta/models/{self.provider}:generateContent?key={self.gemini_key}"
-                prompt = (
-                    "You are Mise, an expert computational gastronomy AI vision system. "
-                    "Analyze this kitchen ingredient or spice jar closely. Identify the ingredients visible. "
-                    "Respond with a JSON array of objects: [{\"name\": \"turmeric\", \"confidence\": 0.95, \"category\": \"powder/spice\", \"notes\": \"Vibrant yellow powder\"}]"
-                )
-                payload = {
-                    "contents": [{
-                        "parts": [
-                            {"text": prompt},
-                            {"inline_data": {"mime_type": "image/jpeg", "data": b64_image}}
-                        ]
-                    }],
-                    "generationConfig": {"response_mime_type": "application/json"}
-                }
-                async with httpx.AsyncClient(timeout=10.0) as client:
-                    resp = await client.post(url, json=payload)
-                    if resp.status_code == 200:
-                        data = resp.json()
-                        text = data["candidates"][0]["content"]["parts"][0]["text"]
-                        import json
-                        items = json.loads(text)
-                        return {
-                            "detected_ingredients": items,
-                            "confidence": 0.94,
-                            "method": "gemini-2.0-flash-vlm",
-                            "analysis_notes": "Cloud Deep Inspect via Gemini Vision API."
-                        }
-            except Exception as e:
-                logger.warning(f"Cloud VLM inspect failed: {e}. Falling back to computational visual analysis.")
+def _parse_response(text: str) -> List[Dict[str, Any]]:
+    m = re.search(r"\{.*\}", text, re.S)
+    if not m:
+        return []
+    try:
+        data = json.loads(m.group(0))
+        items = []
+        for it in data.get("ingredients", []):
+            name = str(it.get("name", "")).strip().lower()
+            if name:
+                conf = float(it.get("confidence", 0.75))
+                items.append({
+                    "name": name,
+                    "confidence": round(min(max(conf, 0.0), 1.0), 2)
+                })
+        return items
+    except Exception:
+        return []
 
-        # Computational Visual Analysis Fallback (PIL Color & Texture Heuristics)
+
+async def deep_inspect(image_bytes: bytes, mime_type: str, consent: bool) -> Dict[str, Any]:
+    if not consent:
+        raise AppException(
+            status_code=400,
+            code="CONSENT_REQUIRED",
+            message="Deep Inspect requires explicit user consent before image processing."
+        )
+
+    if len(image_bytes) > 8 * 1024 * 1024:
+        raise AppException(
+            status_code=413,
+            code="PAYLOAD_TOO_LARGE",
+            message="Image exceeds maximum permitted size of 8 MB."
+        )
+
+    gemini_key = settings.GEMINI_API_KEY or settings.GOOGLE_API_KEY
+    openai_key = settings.OPENAI_API_KEY
+
+    if not gemini_key and not openai_key:
+        raise AppException(
+            status_code=503,
+            code="SERVICE_UNAVAILABLE",
+            message="No vision provider key is configured on the server. Set GEMINI_API_KEY or OPENAI_API_KEY."
+        )
+
+    b64 = base64.b64encode(image_bytes).decode("utf-8")
+
+    # 1. Try Gemini
+    if gemini_key:
+        url = f"https://generativelanguage.googleapis.com/v1beta/models/{settings.VISION_MODEL}:generateContent"
+        body = {
+            "contents": [{
+                "parts": [
+                    {"text": PROMPT},
+                    {"inline_data": {"mime_type": mime_type, "data": b64}},
+                ]
+            }],
+            "generationConfig": {"temperature": 0.1, "maxOutputTokens": 600},
+        }
         try:
-            img = Image.open(io.BytesIO(image_bytes)).convert("RGB")
-            stat = ImageStat.Stat(img)
-            r, g, b = stat.mean[:3]
-            r_std, g_std, b_std = stat.stddev[:3]
-
-            detected = []
-            notes = []
-
-            # Color heuristic rules for culinary spices
-            if r > 130 and g > 110 and b < 70:
-                detected.append({"name": "turmeric", "confidence": 0.91, "category": "Powders/Granules", "notes": "High yellow-gold spectral signature (curcuminoid reflection)"})
-                notes.append("Identified vibrant golden yellow spectrum indicative of pure Turmeric powder.")
-            elif r > 120 and g < 75 and b < 75:
-                detected.append({"name": "red chilli", "confidence": 0.89, "category": "Powders/Granules", "notes": "Deep crimson carotenoid reflectance"})
-                notes.append("Identified rich red pigment with capsaicinoid color tone.")
-            elif r > 100 and g > 80 and b < 50:
-                detected.append({"name": "cumin", "confidence": 0.86, "category": "Whole Spices/Aromatics", "notes": "Earthy tan-brown granule texture with striations"})
-                notes.append("Identified earthy brown seeds consistent with whole Cumin.")
-            elif r > 180 and g > 180 and b > 180 and (r_std + g_std + b_std) < 80:
-                detected.append({"name": "salt", "confidence": 0.92, "category": "Powders/Granules", "notes": "High albedo white crystalline reflectance"})
-                notes.append("Uniform white crystalline reflection indicating culinary salt.")
-            elif r < 60 and g < 60 and b < 60:
-                detected.append({"name": "black pepper", "confidence": 0.88, "category": "Powders/Granules", "notes": "Dark coarse peppercorn particulate"})
-                notes.append("Dark granular particulate signature consistent with ground black pepper.")
-            else:
-                # Default multi-spice counter inspection
-                detected.append({"name": "cumin", "confidence": 0.85, "category": "Whole Spices/Aromatics", "notes": "Earthy aromatic seeds"})
-                detected.append({"name": "turmeric", "confidence": 0.82, "category": "Powders/Granules", "notes": "Warm golden culinary spice"})
-                notes.append("Spectral analysis detected pantry aromatics and spices.")
-
-            return {
-                "detected_ingredients": detected,
-                "confidence": round(detected[0]["confidence"], 2),
-                "method": "edge-computational-spectral-fallback",
-                "analysis_notes": " ".join(notes)
-            }
+            async with httpx.AsyncClient(timeout=25.0) as client:
+                res = await client.post(url, params={"key": gemini_key}, json=body)
+                if res.status_code == 200:
+                    text = res.json()["candidates"][0]["content"]["parts"][0]["text"]
+                    items = _parse_response(text)
+                    return {
+                        "provider": "gemini",
+                        "ingredients": items,
+                        "provenance": "deep_inspect"
+                    }
         except Exception as e:
-            logger.error(f"Visual processing error: {e}")
-            return {
-                "detected_ingredients": [{"name": "cumin", "confidence": 0.85, "category": "Spice", "notes": "Counter spice"}],
-                "confidence": 0.85,
-                "method": "offline-fallback",
-                "analysis_notes": "Fallback spice detection profile applied."
-            }
+            logger.error(f"Gemini inspect failed: {e}")
 
-vision_service = VisionService()
+    # 2. Try OpenAI
+    if openai_key:
+        try:
+            async with httpx.AsyncClient(timeout=25.0) as client:
+                res = await client.post(
+                    "https://api.openai.com/v1/chat/completions",
+                    headers={"Authorization": f"Bearer {openai_key}"},
+                    json={
+                        "model": "gpt-4o-mini",
+                        "temperature": 0.1,
+                        "response_format": {"type": "json_object"},
+                        "messages": [{
+                            "role": "user",
+                            "content": [
+                                {"type": "text", "text": PROMPT},
+                                {"type": "image_url", "image_url": {"url": f"data:{mime_type};base64,{b64}"}}
+                            ]
+                        }]
+                    }
+                )
+                if res.status_code == 200:
+                    content = res.json()["choices"][0]["message"]["content"]
+                    items = _parse_response(content)
+                    return {
+                        "provider": "openai",
+                        "ingredients": items,
+                        "provenance": "deep_inspect"
+                    }
+        except Exception as e:
+            logger.error(f"OpenAI inspect failed: {e}")
+
+    raise AppException(
+        status_code=503,
+        code="VISION_FAILED",
+        message="Vision provider returned an error or unparseable response."
+    )

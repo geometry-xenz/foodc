@@ -1,58 +1,88 @@
-import os
-import datetime
-from typing import Optional
-from jose import JWTError, jwt
-from passlib.context import CryptContext
-from fastapi import Depends, HTTPException, status
-from fastapi.security import OAuth2PasswordBearer
-from sqlalchemy.orm import Session
+"""
+Authentication and security helpers.
+Adheres to D3: Opaque tokens, no unmaintained JWT libraries.
+Uses Argon2id for passwords and SHA-256 for token storage.
+"""
+import hashlib
+import secrets
+from datetime import datetime, timedelta, timezone
+from typing import Tuple
+from argon2 import PasswordHasher
+from argon2.exceptions import VerifyMismatchError
+from fastapi import Response
 
-from backend.app.database import get_db
+ph = PasswordHasher(
+    time_cost=3,
+    memory_cost=65536,
+    parallelism=4,
+    hash_len=32,
+    salt_len=16
+)
 
-SECRET_KEY = os.getenv("JWT_SECRET", "drishyam_super_secret_gastronomy_key_2026")
-ALGORITHM = "HS256"
-ACCESS_TOKEN_EXPIRE_MINUTES = 60 * 24 * 7 # 7 days
 
-pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
-oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/api/auth/login", auto_error=False)
+def hash_password(password: str) -> str:
+    return ph.hash(password)
+
 
 def verify_password(plain_password: str, hashed_password: str) -> bool:
-    return pwd_context.verify(plain_password, hashed_password)
-
-def get_password_hash(password: str) -> str:
-    return pwd_context.hash(password)
-
-def create_access_token(data: dict, expires_delta: Optional[datetime.timedelta] = None) -> str:
-    to_encode = data.copy()
-    expire = datetime.datetime.now(datetime.timezone.utc) + (expires_delta or datetime.timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES))
-    to_encode.update({"exp": expire})
-    return jwt.encode(to_encode, SECRET_KEY, algorithm=ALGORITHM)
-
-def get_current_user_optional(token: Optional[str] = Depends(oauth2_scheme), db: Session = Depends(get_db)):
-    if not token:
-        # Fallback to demo default user if present
-        from backend.app.models.user import User
-        demo_user = db.query(User).filter(User.email == "demo@drishyam.ai").first()
-        return demo_user
-
     try:
-        payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
-        user_id = payload.get("sub")
-        if user_id is None:
-            return None
-    except JWTError:
-        return None
+        return ph.verify(hashed_password, plain_password)
+    except VerifyMismatchError:
+        return False
+    except Exception:
+        return False
 
-    from backend.app.models.user import User
-    user = db.query(User).filter(User.id == int(user_id)).first()
-    return user
 
-def get_current_user(token: Optional[str] = Depends(oauth2_scheme), db: Session = Depends(get_db)):
-    user = get_current_user_optional(token, db)
-    if not user:
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Authentication required.",
-            headers={"WWW-Authenticate": "Bearer"},
-        )
-    return user
+def generate_opaque_token() -> str:
+    """Generate 256-bit URL-safe random token."""
+    return secrets.token_urlsafe(32)
+
+
+def hash_token(token: str) -> str:
+    """SHA-256 hash for secure database lookup."""
+    return hashlib.sha256(token.encode("utf-8")).hexdigest()
+
+
+def create_web_session() -> Tuple[str, str, datetime]:
+    """Returns (raw_session_token, session_hash, expires_at). 7-day sliding expiry."""
+    token = generate_opaque_token()
+    token_hash = hash_token(token)
+    expires_at = datetime.now(timezone.utc) + timedelta(days=7)
+    return token, token_hash, expires_at
+
+
+def create_android_token_pair() -> Tuple[str, str, str, str, datetime, datetime]:
+    """Returns (raw_access, access_hash, raw_refresh, refresh_hash, access_expires, refresh_expires)."""
+    raw_access = generate_opaque_token()
+    access_hash = hash_token(raw_access)
+    access_expires = datetime.now(timezone.utc) + timedelta(minutes=15)
+
+    raw_refresh = generate_opaque_token()
+    refresh_hash = hash_token(raw_refresh)
+    refresh_expires = datetime.now(timezone.utc) + timedelta(days=30)
+
+    return raw_access, access_hash, raw_refresh, refresh_hash, access_expires, refresh_expires
+
+
+COOKIE_NAME = "drishyam_session"
+
+
+def set_session_cookie(response: Response, raw_token: str, secure: bool = False):
+    response.set_cookie(
+        key=COOKIE_NAME,
+        value=raw_token,
+        httponly=True,
+        samesite="lax",
+        secure=secure,
+        max_age=7 * 24 * 3600,
+        path="/"
+    )
+
+
+def clear_session_cookie(response: Response):
+    response.delete_cookie(
+        key=COOKIE_NAME,
+        path="/",
+        httponly=True,
+        samesite="lax"
+    )

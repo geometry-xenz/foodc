@@ -25,8 +25,15 @@ APP_ROUTES = [
     ("dashboard", "/app", "Your kitchen"),
     ("pantry", "/app/pantry", "Your pantry"),
     ("recipes", "/app/recipes", "Your recipes"),
+    ("flavour", "/app/flavour", "Molecular Aroma Network"),
+    ("meal-planner", "/app/meal-planner", "Compose your day"),
+    ("meal-history", "/app/meal-history", "Meal History & Portions"),
+    ("shopping", "/app/shopping", "Shopping List"),
     ("nutrition", "/app/nutrition", "Your biology"),
-    ("planner", "/app/planner", "Compose your day"),
+    ("goals", "/app/goals", "Goals & Target Configuration"),
+    ("saved", "/app/saved", "Saved Recipes"),
+    ("profile", "/app/profile", "Profile & Preferences"),
+    ("settings", "/app/settings", "Settings & Account"),
 ]
 
 console_errors: list[str] = []
@@ -140,6 +147,8 @@ def chromium_executable() -> str | None:
         ),
         reverse=True,
     )
+    if not candidates and os.path.exists("/usr/bin/chromium"):
+        return "/usr/bin/chromium"
     return candidates[0] if candidates else None
 
 

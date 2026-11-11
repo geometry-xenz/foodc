@@ -102,9 +102,9 @@ export function SceneShell({
     <section
       id={id}
       ref={sectionRef}
-      className={cn("relative scroll-mt-24 px-5 py-20 sm:px-8 md:min-h-[150vh] md:py-0", className)}
+      className={cn("relative scroll-mt-24 px-5 py-20 sm:px-8 md:py-28", className)}
     >
-      <div className="md:sticky md:top-0 md:flex md:min-h-screen md:items-center">
+      <div>
         <div className="mx-auto w-full max-w-[1280px]">
           {stacked ? (
             <div>

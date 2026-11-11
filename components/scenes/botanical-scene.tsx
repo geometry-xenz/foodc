@@ -1,36 +1,41 @@
 import { Beaker, Leaf, Sparkles } from "lucide-react";
-import { entities, getScientificName } from "@/lib/flavor";
 
 const CARD_DATA = [
   {
     key: "turmeric",
     name: "Turmeric",
+    scientificName: "Curcuma longa",
     family: "Zingiberaceae",
     accent: "#E9A23B",
     glow: "rgba(233,162,59,.18)",
     compounds: ["curcumin", "ar-turmerone", "curcumenol", "zingiberene"],
+    pairs: ["black_pepper", "ginger", "cumin", "coriander"],
     oils: "Curcuminoids · 3–5% of rhizome",
     note: "Earthy, warm and woody. Curcumin carries the golden colour; turmerones carry the bitter aromatic lift.",
   },
   {
     key: "cumin",
     name: "Cumin",
+    scientificName: "Cuminum cyminum",
     family: "Apiaceae",
     accent: "#C58B53",
     glow: "rgba(197,139,83,.16)",
     compounds: ["cuminaldehyde", "pinene", "myrcene", "beta-caryophyllene"],
+    pairs: ["coriander", "turmeric", "fennel", "chilli"],
     oils: "Cuminaldehyde · 35–60% of oil",
     note: "Nutty, pungent and warm. Cuminaldehyde defines the recognisable jeera signature.",
   },
   {
     key: "cloves",
     name: "Cloves",
+    scientificName: "Syzygium aromaticum",
     family: "Myrtaceae",
     accent: "#D9784A",
     glow: "rgba(217,120,74,.17)",
-    compounds: ["eugenol", "eugenyl acetate", "beta-caryophyllene", "vanillin"],
-    oils: "Eugenol · 70–85% of oil",
-    note: "Sweet, medicinal and woody. Eugenol is the warm phenol that anchors garam masala.",
+    compounds: ["eugenol", "eugenyl acetate", "beta-caryophyllene"],
+    pairs: ["cinnamon", "cardamom", "nutmeg", "ginger"],
+    oils: "Eugenol · 70–90% of bud oil",
+    note: "Sweet, pungent and medicinal. Eugenol delivers numbing warmth and high coherence with cinnamon.",
   },
 ];
 
@@ -38,7 +43,6 @@ export function BotanicalScene() {
   return (
     <div className="grid grid-cols-1 gap-4 sm:grid-cols-3 lg:gap-3.5">
       {CARD_DATA.map((card, index) => {
-        const entity = entities[card.key];
         return (
           <article
             key={card.key}
@@ -81,7 +85,7 @@ export function BotanicalScene() {
               <div className="flex justify-between gap-2">
                 <span className="text-[#6F665B]">Botanical</span>
                 <span className="text-right italic text-[#C9B79F]">
-                  {getScientificName(card.key)}
+                  {card.scientificName}
                 </span>
               </div>
               <div className="flex justify-between gap-2">
@@ -118,7 +122,7 @@ export function BotanicalScene() {
               {card.note}
             </p>
             <div className="relative mt-4 flex flex-wrap gap-1">
-              {(entity?.synergistic_pairs ?? []).slice(0, 4).map((pair) => (
+              {card.pairs.slice(0, 4).map((pair) => (
                 <span
                   key={pair}
                   className="text-[0.52rem] uppercase tracking-[0.1em] text-[#6E6458]"

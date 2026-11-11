@@ -1,8 +1,7 @@
 import { redirect } from "next/navigation";
 import Link from "next/link";
 import { ArrowUpRight, FlaskConical, ScanEye } from "lucide-react";
-import { getSessionUser } from "@/lib/auth";
-import { entities } from "@/lib/flavor";
+import { getSessionUser, api } from "@/lib/api";
 import { LoginForm } from "@/components/auth/login-form";
 
 export default async function LoginPage({
@@ -16,17 +15,21 @@ export default async function LoginPage({
   const params = await searchParams;
   const mode = params.mode === "register" ? "register" : "login";
   const next = params.next?.startsWith("/") ? params.next : "/app";
-  const compoundCount = Object.values(entities).reduce(
-    (total, entity) => total + entity.volatile_compounds.length,
-    0,
-  );
+
+  let compoundCount = 2287;
+  try {
+    const showcase = await api.get<{ molecules?: number }>("/api/public/showcase");
+    if (showcase?.molecules) compoundCount = showcase.molecules;
+  } catch {
+    // fallback to curated static number
+  }
 
   return (
     <main className="relative min-h-screen overflow-hidden bg-[#080808]">
       <div className="absolute inset-0 lg:left-[46%]">
         <div
           className="absolute inset-0 bg-cover bg-center opacity-55"
-          style={{ backgroundImage: "url(/images/hero-poster.jpg)" }}
+          style={{ backgroundImage: "url(/videos/hero-poster.webp)" }}
         />
         <div className="hero-vignette absolute inset-0" />
         <div className="absolute inset-0 bg-[linear-gradient(90deg,#080808_0%,rgba(8,8,8,.82)_30%,rgba(8,8,8,.25)_70%,rgba(8,8,8,.6)_100%)]" />
@@ -64,7 +67,7 @@ export default async function LoginPage({
               {[
                 { value: "4", label: "Engine layers" },
                 { value: String(compoundCount), label: "Compound links" },
-                { value: "6", label: "Goal protocols" },
+                { value: "8", label: "Goal protocols" },
               ].map((stat) => (
                 <div key={stat.label}>
                   <div className="font-display text-3xl text-[#F3D3A1]">{stat.value}</div>

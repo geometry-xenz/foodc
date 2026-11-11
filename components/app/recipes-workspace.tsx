@@ -17,8 +17,7 @@ import {
   Users,
   X,
 } from "lucide-react";
-import { cn, formatNumber } from "@/lib/utils";
-import { displayName } from "@/lib/flavor";
+import { cn, displayName, formatNumber } from "@/lib/utils";
 import type {
   RecipeRecord,
   ScoredRecipe,
@@ -74,8 +73,8 @@ const DIETS = [
 ] as const;
 
 function hardMissing(recipe: ScoredRecipe) {
-  return recipe.ingredientsMissing.filter(
-    (name) => !["salt", "oil", "water", "sugar"].includes(name),
+  return (recipe.ingredientsMissing || []).filter(
+    (name) => !["salt", "oil", "water", "sugar"].includes(name.toLowerCase()),
   );
 }
 
@@ -160,7 +159,7 @@ export function RecipesWorkspace({
         !query ||
         recipe.title.toLowerCase().includes(query) ||
         recipe.cuisine.toLowerCase().includes(query) ||
-        recipe.dominantAroma.toLowerCase().includes(query);
+        (recipe.dominantAroma || "").toLowerCase().includes(query);
       const matchesDiet =
         diet === "all" ||
         (diet === "vegetarian"
@@ -543,11 +542,11 @@ function RecipeDetailContent({
 
             <div className="mt-4 grid grid-cols-5 gap-1.5">
               {[
-                { label: "kcal", value: recipe.nutrition_per_serving.calories },
-                { label: "protein", value: `${recipe.nutrition_per_serving.protein}g` },
-                { label: "carbs", value: `${recipe.nutrition_per_serving.carbs}g` },
-                { label: "fat", value: `${recipe.nutrition_per_serving.fat}g` },
-                { label: "fibre", value: `${recipe.nutrition_per_serving.fibre}g` },
+                { label: "kcal", value: recipe.nutrition_per_serving?.calories ?? (recipe as any).calories },
+                { label: "protein", value: `${recipe.nutrition_per_serving?.protein ?? (recipe as any).protein}g` },
+                { label: "carbs", value: `${recipe.nutrition_per_serving?.carbs ?? (recipe as any).carbs}g` },
+                { label: "fat", value: `${recipe.nutrition_per_serving?.fat ?? (recipe as any).fat}g` },
+                { label: "fibre", value: `${recipe.nutrition_per_serving?.fibre ?? (recipe as any).fiber ?? 0}g` },
               ].map((macro) => (
                 <div
                   key={macro.label}
@@ -677,7 +676,7 @@ function RecipeDetailContent({
                 <span className="font-display text-[0.9rem] leading-5 text-[#C9A15C]">
                   {String(index + 1).padStart(2, "0")}
                 </span>
-                {step}
+                {typeof step === "string" ? step : ((step as any)?.text ?? String(step))}
               </li>
             ))}
           </ol>

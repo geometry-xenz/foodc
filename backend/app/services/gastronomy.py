@@ -1,155 +1,136 @@
-import logging
-from typing import List, Dict, Any, Tuple, Optional
-from collections import Counter
+"""
+Computational gastronomy ranking engine based on molecular flavour science.
+Adheres to §5.6 and D1 (ported from Mise/Foodoscope ranking.py).
+"""
+import re
+from typing import Any, Dict, List, Optional, Set, Tuple
 
-from backend.app.services.flavordb import flavordb_client
-from backend.app.models.schemas import ScoreBreakdown, RecipeCandidate
+STAPLES: Set[str] = {
+    "water", "salt", "black salt", "rock salt", "cooking oil", "vegetable oil",
+    "oil", "olive oil", "mustard oil", "sunflower oil", "ghee", "butter"
+}
 
-logger = logging.getLogger(__name__)
 
-class ComputationalGastronomyEngine:
-    """
-    Ranks recipes using Foodoscope's molecular aroma pairing and kitchen pantry utilization:
-    score = 0.30 * core_coverage + 0.20 * counter_utilisation + 0.20 * flavour_coherence + 0.30 * gap_fit
-    """
+def norm(name: str) -> str:
+    """Normalize ingredient name for matching."""
+    s = name.lower().strip()
+    s = re.sub(r"\b(fresh|dried|ground|powdered|powder|chopped|diced|sliced|crushed|whole)\b", "", s)
+    s = re.sub(r"[^\w\s]", "", s)
+    s = re.sub(r"\s+", " ", s).strip()
+    # Simple English plural reduction
+    if s.endswith("ies") and len(s) > 4:
+        s = s[:-3] + "y"
+    elif s.endswith("es") and len(s) > 3 and s[-3] in "sxczo":
+        s = s[:-2]
+    elif s.endswith("s") and len(s) > 3 and not s.endswith("ss"):
+        s = s[:-1]
+    return s
+
+
+def is_staple(name: str) -> bool:
+    return norm(name) in STAPLES
+
+
+def diet_ok(recipe_diet_tag: str, user_diet: str) -> bool:
+    """Hard filter for diet. 'vegetarian' MUST NOT match inside 'non-vegetarian'."""
+    if not user_diet or user_diet.lower() in ("any", "none"):
+        return True
     
-    def normalize(self, name: str) -> str:
-        return flavordb_client.normalize_ingredient(name)
+    rd = recipe_diet_tag.lower().strip()
+    ud = user_diet.lower().strip()
 
-    async def score_recipe(
-        self,
-        pantry_items: List[str],
-        recipe: Dict[str, Any]
-    ) -> Tuple[RecipeCandidate, Dict[str, float]]:
-        norm_pantry = set(self.normalize(x) for x in pantry_items)
-        
-        # Extract recipe ingredients
-        recipe_ing_names = []
-        for item in recipe.get("ingredients", []):
-            if isinstance(item, dict):
-                recipe_ing_names.append(self.normalize(item.get("name", "")))
-            else:
-                recipe_ing_names.append(self.normalize(str(item)))
+    if ud == "vegan":
+        return rd == "vegan"
+    if ud == "vegetarian":
+        return rd in ("vegetarian", "vegan") and "non" not in rd
+    if ud == "non-vegetarian":
+        return True
+    if ud == "pescatarian":
+        return rd in ("vegetarian", "vegan", "pescatarian")
+    return True
 
-        recipe_set = set(recipe_ing_names)
-        available = list(recipe_set.intersection(norm_pantry))
-        missing = list(recipe_set - norm_pantry)
 
-        # 1. Core Coverage (30%): Essential dish-defining ingredients present
-        core_raw = recipe.get("core_ingredients", [])
-        norm_core = [self.normalize(c) for c in core_raw] if core_raw else recipe_ing_names[:3]
-        if norm_core:
-            matched_core = [c for c in norm_core if c in norm_pantry]
-            core_coverage = len(matched_core) / len(norm_core)
-        else:
-            core_coverage = 0.5
+def allergy_ok(recipe_ingredients: List[str], user_allergies: List[str]) -> bool:
+    """Hard gate: return False if any recipe ingredient matches user allergen."""
+    if not user_allergies:
+        return True
+    
+    norm_allergens = [norm(a) for a in user_allergies if a.strip()]
+    for ing in recipe_ingredients:
+        n_ing = norm(ing)
+        for a in norm_allergens:
+            if a in n_ing or n_ing in a:
+                return False
+    return True
 
-        # 2. Counter Utilisation (20%): Percentage of counter items used
-        if norm_pantry:
-            counter_utilisation = len(available) / len(norm_pantry)
-        else:
-            counter_utilisation = 0.0
-        counter_utilisation = min(counter_utilisation, 1.0)
 
-        # 3. Flavour Coherence (20%): Molecular pairing from FlavorDB
-        flavour_coherence = await flavordb_client.compute_molecular_coherence(
-            list(norm_pantry),
-            recipe_ing_names
-        )
+def score_recipe(
+    recipe: Dict[str, Any],
+    pantry: List[str],
+    flavor_compound_map: Optional[Dict[str, Set[str]]] = None
+) -> Tuple[float, Dict[str, Any]]:
+    """
+    Score a recipe using computational gastronomy:
+      0.30 * core_coverage + 0.20 * utilisation + 0.20 * flavour_coherence + 0.30 * gap_fit
+    """
+    pantry_norms = {norm(p) for p in pantry if p and not is_staple(p)}
+    if not pantry_norms:
+        return 0.0, {}
 
-        # 4. Gap Fit (30%): How few and accessible are missing items
-        total_items = max(len(recipe_set), 1)
-        # Pantry basics (salt, oil, water) don't penalize as heavily
-        basic_staples = {"salt", "oil", "water", "sugar"}
-        hard_missing = [m for m in missing if m not in basic_staples]
-        
-        gap_fit = 1.0 - (len(hard_missing) / total_items)
-        gap_fit = max(0.0, min(gap_fit, 1.0))
+    raw_ings = recipe.get("ingredients", [])
+    recipe_ings = [norm(i) for i in raw_ings if not is_staple(i)]
+    if not recipe_ings:
+        return 0.0, {}
 
-        # Composite score
-        composite = (
-            0.30 * core_coverage +
-            0.20 * counter_utilisation +
-            0.20 * flavour_coherence +
-            0.30 * gap_fit
-        )
-        composite = round(min(max(composite, 0.0), 1.0), 3)
+    # Core coverage: first 4 ingredients define the dish
+    core_ings = recipe_ings[:4]
+    matched_core = [c for c in core_ings if c in pantry_norms]
+    core_coverage = len(matched_core) / max(len(core_ings), 1)
 
-        explanation = (
-            f"Core Match: {int(core_coverage * 100)}% | "
-            f"Pantry Used: {int(counter_utilisation * 100)}% | "
-            f"Aroma Coherence: {int(flavour_coherence * 100)}% | "
-            f"Recipe Feasibility: {int(gap_fit * 100)}%"
-        )
+    # General matching
+    matched = [i for i in recipe_ings if i in pantry_norms]
+    missing = [i for i in recipe_ings if i not in pantry_norms]
 
-        breakdown = ScoreBreakdown(
-            core_coverage=round(core_coverage, 2),
-            counter_utilisation=round(counter_utilisation, 2),
-            flavour_coherence=round(flavour_coherence, 2),
-            gap_fit=round(gap_fit, 2),
-            composite_score=composite,
-            explanation=explanation
-        )
+    # Utilisation: what fraction of the user's counter does this dish consume?
+    used_from_pantry = [p for p in pantry_norms if p in recipe_ings]
+    utilisation = len(used_from_pantry) / max(len(pantry_norms), 1)
 
-        match_pct = round((len(available) / max(len(recipe_set), 1)) * 100, 1)
+    # Gap fit: penalty for missing ingredients, especially core ones
+    gap_penalty = (len([m for m in missing if m in core_ings]) * 0.4 +
+                   len([m for m in missing if m not in core_ings]) * 0.15)
+    gap_fit = max(0.0, 1.0 - (gap_penalty / max(len(recipe_ings), 1)))
 
-        # One ingredient to buy
-        one_to_buy = hard_missing[0] if hard_missing else None
+    # Flavour Coherence: aroma compound sharing between pantry and recipe
+    flavour_coherence = 0.5  # baseline
+    if flavor_compound_map and len(used_from_pantry) >= 2:
+        pairs_shared = 0
+        total_pairs = 0
+        p_list = list(used_from_pantry)
+        for i in range(len(p_list)):
+            for j in range(i + 1, len(p_list)):
+                total_pairs += 1
+                c1 = flavor_compound_map.get(p_list[i], set())
+                c2 = flavor_compound_map.get(p_list[j], set())
+                if c1 and c2 and (c1 & c2):
+                    pairs_shared += 1
+        if total_pairs > 0:
+            flavour_coherence = pairs_shared / total_pairs
 
-        nut = recipe.get("nutrition_per_serving", {})
+    final_score = (
+        0.30 * core_coverage +
+        0.20 * utilisation +
+        0.20 * flavour_coherence +
+        0.30 * gap_fit
+    ) * 100.0
 
-        candidate = RecipeCandidate(
-            recipe_id=recipe.get("recipe_id", "rec_unknown"),
-            title=recipe.get("title", "Delicious Dish"),
-            cuisine=recipe.get("cuisine", "Gastronomic"),
-            diet=recipe.get("diet", "any"),
-            prep_time_minutes=recipe.get("prep_time_minutes", 10),
-            cook_time_minutes=recipe.get("cook_time_minutes", 20),
-            total_time_minutes=recipe.get("total_time_minutes", 30),
-            servings=recipe.get("servings", 2),
-            image_url=recipe.get("image_url", "https://images.unsplash.com/photo-1546833999-b9f581a1996d?w=800"),
-            ingredients_available=available,
-            ingredients_missing=missing,
-            match_percentage=match_pct,
-            gastronomy_score=breakdown,
-            calories_per_serving=nut.get("calories"),
-            protein_grams=nut.get("protein"),
-            carbs_grams=nut.get("carbs"),
-            fat_grams=nut.get("fat"),
-            fibre_grams=nut.get("fibre"),
-            one_ingredient_to_buy=one_to_buy,
-            molecular_pairing_notes=recipe.get("molecular_profile", {}).get("notes")
-        )
-
-        return candidate, {"composite": composite}
-
-    async def compute_unlock_suggestion(
-        self,
-        pantry_items: List[str],
-        ranked_recipes: List[RecipeCandidate]
-    ) -> Optional[Dict[str, Any]]:
-        """
-        Computes which *single missing ingredient* provides the highest increase in
-        flavor coherence and recipe unlock rate.
-        """
-        all_missing = []
-        for r in ranked_recipes:
-            for m in r.ingredients_missing:
-                if m not in ("salt", "oil", "water"):
-                    all_missing.append(m)
-
-        if not all_missing:
-            return None
-
-        counts = Counter(all_missing)
-        top_ingredient, frequency = counts.most_common(1)[0]
-
-        # Calculate impact
-        return {
-            "ingredient": top_ingredient,
-            "recipes_unlocked_count": frequency,
-            "impact_description": f"Adding '{top_ingredient.title()}' unlocks {frequency} additional dish{'es' if frequency > 1 else ''} with strong molecular pairing synergies.",
-            "estimated_unlock_gain_percent": round((frequency / max(len(ranked_recipes), 1)) * 100, 1)
-        }
-
-gastronomy_engine = ComputationalGastronomyEngine()
+    breakdown = {
+        "score": round(final_score, 1),
+        "core_coverage": round(core_coverage, 2),
+        "utilisation": round(utilisation, 2),
+        "flavour_coherence": round(flavour_coherence, 2),
+        "gap_fit": round(gap_fit, 2),
+        "matched": matched,
+        "missing": missing,
+        "core_missing": [m for m in missing if m in core_ings],
+    }
+    return final_score, breakdown

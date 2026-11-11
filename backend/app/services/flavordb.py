@@ -1,189 +1,137 @@
-import os
+"""
+Async FlavorDB Client & Molecular Aroma Network.
+Computes volatile compound overlap and chemical pairings.
+Adheres to §5.4, §12, and D5.
+"""
+from datetime import datetime, timezone
 import json
 import logging
-from typing import Dict, Any, List, Optional
+from typing import Any, Dict, List, Optional, Set
 import httpx
+from sqlalchemy import select
+from sqlalchemy.ext.asyncio import AsyncSession
+from app.config import get_settings
+from app.models.entities import ExternalCache, FlavourCompound, IngredientCompound
 
-from backend.app.config import settings
-from backend.app.services.cache import cache
+logger = logging.getLogger("drishyam.flavordb")
+settings = get_settings()
 
-logger = logging.getLogger(__name__)
+_calls = {"n": 0}
 
-DATA_FILE = os.path.join(os.path.dirname(__file__), "..", "data", "flavordb_dataset.json")
 
-class FlavorDBClient:
-    def __init__(self):
+class FlavorDBService:
+    def __init__(self, db: AsyncSession):
+        self.db = db
         self.api_key = settings.FOODOSCOPE_API_KEY
-        self.base_url = settings.FLAVORDB_BASE_URL
-        self._offline_data = self._load_offline_data()
+        self.base_url = settings.FOODOSCOPE_FLAVORDB_BASE.rstrip("/")
+        self.timeout = settings.FOODOSCOPE_TIMEOUT
 
-    def _load_offline_data(self) -> Dict[str, Any]:
-        try:
-            if os.path.exists(DATA_FILE):
-                with open(DATA_FILE, "r", encoding="utf-8") as f:
-                    return json.load(f)
-        except Exception as e:
-            logger.error(f"Error loading offline FlavorDB dataset: {e}")
-        return {"entities": {}, "substitutions": {}}
+    async def get_ingredient_compounds(self, ingredient: str) -> List[Dict[str, Any]]:
+        """Return volatile aroma compounds for an ingredient."""
+        ing_clean = ingredient.strip().lower()
+        if not ing_clean:
+            return []
 
-    def normalize_ingredient(self, name: str) -> str:
-        raw = name.strip().lower()
-        mapping = {
-            "turmeric powder": "turmeric",
-            "haldi": "turmeric",
-            "jeera": "cumin",
-            "cumin seeds": "cumin",
-            "black pepper powder": "black pepper",
-            "kali mirch": "black pepper",
-            "pepper": "black pepper",
-            "chilli powder": "red chilli",
-            "red chilli powder": "red chilli",
-            "chili": "red chilli",
-            "coriander powder": "coriander",
-            "dhaniya": "coriander",
-            "clove": "cloves",
-            "laung": "cloves",
-            "elaichi": "cardamom",
-            "green cardamom": "cardamom",
-            "cinnamon stick": "cinnamon",
-            "dalchini": "cinnamon",
-            "garlic cloves": "garlic",
-            "lasun": "garlic",
-            "adrak": "ginger",
-            "pyaz": "onion",
-            "tamatar": "tomato",
-            "rai": "mustard seeds",
-            "sarson": "mustard seeds",
-            "cottage cheese": "paneer",
-            "dal": "lentils",
-            "basmati rice": "rice",
-            "chana": "chickpeas"
+        # Check local database first
+        stmt = select(IngredientCompound).where(IngredientCompound.ingredient_name == ing_clean)
+        res = await self.db.execute(stmt)
+        rows = res.scalars().all()
+        if rows:
+            return [{"name": r.compound_name, "pubchem_id": r.pubchem_id} for r in rows]
+
+        # Check cache
+        cache_key = f"flavordb:compounds:{ing_clean}"
+        stmt_c = select(ExternalCache).where(ExternalCache.cache_key == cache_key)
+        res_c = await self.db.execute(stmt_c)
+        cached = res_c.scalar_one_or_none()
+        if cached:
+            return cached.payload.get("compounds", [])
+
+        # Live call to FlavorDB if available
+        if not self.api_key or _calls["n"] >= settings.FOODOSCOPE_MAX_CALLS:
+            return []
+
+        # Step 1: get entity id by readable alias
+        headers = {
+            "Authorization": f"Bearer {self.api_key}",
+            "ApiKey": self.api_key,
+            "Accept": "application/json"
         }
-        for k, v in mapping.items():
-            if k in raw:
-                return v
-        return raw
+        try:
+            _calls["n"] += 1
+            async with httpx.AsyncClient(timeout=self.timeout) as client:
+                r1 = await client.get(
+                    f"{self.base_url}/entities/by-entity-alias-readable",
+                    headers=headers,
+                    params={"entity_alias_readable": ing_clean}
+                )
+                if r1.status_code != 200:
+                    return []
+                data1 = r1.json()
+                entity_id = self._extract_entity_id(data1)
+                if not entity_id:
+                    return []
 
-    async def get_entity_profile(self, ingredient_name: str) -> Optional[Dict[str, Any]]:
-        norm = self.normalize_ingredient(ingredient_name)
-        cache_key = f"flavordb:entity:{norm}"
-        cached = cache.get(cache_key)
-        if cached:
-            return cached
-
-        # Check API if configured
-        if self.api_key and not settings.OFFLINE_MODE:
-            try:
-                headers = {"Authorization": f"Bearer {self.api_key}"}
-                url = f"{self.base_url}/entities/by-entity-alias-readable"
-                async with httpx.AsyncClient(timeout=4.0) as client:
-                    resp = await client.get(url, params={"alias": norm}, headers=headers)
-                    if resp.status_code == 200:
-                        data = resp.json()
-                        cache.set(cache_key, data)
-                        return data
-            except Exception as e:
-                logger.warning(f"FlavorDB API request failed for '{norm}': {e}. Using offline data.")
-
-        # Fallback to local dataset
-        entities = self._offline_data.get("entities", {})
-        if norm in entities:
-            res = entities[norm]
-            cache.set(cache_key, res)
-            return res
-
-        # Fuzzy check in local dataset
-        for ent_name, val in entities.items():
-            if ent_name in norm or norm in ent_name:
-                cache.set(cache_key, val)
-                return val
-
-        return None
-
-    async def get_substitutions(self, ingredient_name: str) -> List[Dict[str, Any]]:
-        norm = self.normalize_ingredient(ingredient_name)
-        cache_key = f"flavordb:substitute:{norm}"
-        cached = cache.get(cache_key)
-        if cached:
-            return cached
-
-        subs = self._offline_data.get("substitutions", {}).get(norm)
-        if subs:
-            cache.set(cache_key, subs)
-            return subs
-
-        # Compute dynamic shared volatile compound overlap
-        target_profile = await self.get_entity_profile(norm)
-        if target_profile and "volatile_compounds" in target_profile:
-            t_compounds = set(target_profile["volatile_compounds"])
-            dynamic_subs = []
-            for other_name, other_profile in self._offline_data.get("entities", {}).items():
-                if other_name == norm:
-                    continue
-                o_compounds = set(other_profile.get("volatile_compounds", []))
-                shared = t_compounds.intersection(o_compounds)
-                if shared:
-                    sim = round(len(shared) / max(len(t_compounds), 1), 2)
-                    dynamic_subs.append({
-                        "name": other_name,
-                        "similarity": min(sim, 0.95),
-                        "shared_compounds": list(shared),
-                        "ratio": "1:1",
-                        "notes": f"Shares {len(shared)} volatile flavor molecules ({', '.join(list(shared)[:3])})."
-                    })
-            dynamic_subs.sort(key=lambda x: x["similarity"], reverse=True)
-            res = dynamic_subs[:4]
-            cache.set(cache_key, res)
-            return res
+                # Step 2: fetch compact molecules
+                _calls["n"] += 1
+                r2 = await client.get(
+                    f"{self.base_url}/entities/by-id/{entity_id}/molecules-compact",
+                    headers=headers
+                )
+                if r2.status_code == 200:
+                    compounds = self._extract_molecules(r2.json())
+                    # Cache in DB
+                    for comp in compounds:
+                        ic = IngredientCompound(
+                            ingredient_name=ing_clean,
+                            compound_name=comp["name"],
+                            pubchem_id=comp.get("pubchem_id")
+                        )
+                        self.db.add(ic)
+                    await self.db.flush()
+                    return compounds
+        except Exception as e:
+            logger.error(f"FlavorDB fetch error for {ing_clean}: {e}")
 
         return []
 
-    async def compute_molecular_coherence(self, ingredients_a: List[str], ingredients_b: List[str]) -> float:
-        """
-        Calculates pairwise molecular aroma compound sharing between detected pantry items
-        and recipe ingredients using FlavorDB.
-        Returns a normalized score between 0.0 and 1.0.
-        """
-        norm_a = [self.normalize_ingredient(x) for x in ingredients_a]
-        norm_b = [self.normalize_ingredient(x) for x in ingredients_b]
+    async def shared_compounds(self, ing_a: str, ing_b: str) -> List[str]:
+        """Compute intersection of aroma compounds between two ingredients."""
+        comp_a = await self.get_ingredient_compounds(ing_a)
+        comp_b = await self.get_ingredient_compounds(ing_b)
 
-        profiles_a = {}
-        for item in norm_a:
-            p = await self.get_entity_profile(item)
-            if p:
-                profiles_a[item] = set(p.get("volatile_compounds", []))
+        names_a = {c["name"].lower() for c in comp_a if "name" in c}
+        names_b = {c["name"].lower() for c in comp_b if "name" in c}
+        return list(names_a.intersection(names_b))
 
-        profiles_b = {}
-        for item in norm_b:
-            p = await self.get_entity_profile(item)
-            if p:
-                profiles_b[item] = set(p.get("volatile_compounds", []))
+    def _extract_entity_id(self, data: Any) -> Optional[int]:
+        if isinstance(data, dict):
+            if "entity_id" in data:
+                return data["entity_id"]
+            if "id" in data:
+                return data["id"]
+            for val in data.values():
+                if isinstance(val, dict) and "entity_id" in val:
+                    return val["entity_id"]
+        return None
 
-        if not profiles_a or not profiles_b:
-            return 0.50 # Neutral default
+    def _extract_molecules(self, data: Any) -> List[Dict[str, Any]]:
+        raw_list = []
+        if isinstance(data, list):
+            raw_list = data
+        elif isinstance(data, dict):
+            for k in ("molecules", "compounds", "data"):
+                if isinstance(data.get(k), list):
+                    raw_list = data[k]
+                    break
 
-        total_pairs = 0
-        shared_score = 0.0
-
-        for item_a, comps_a in profiles_a.items():
-            for item_b, comps_b in profiles_b.items():
-                if item_a == item_b:
-                    shared_score += 1.0
-                    total_pairs += 1
-                    continue
-                intersection = comps_a.intersection(comps_b)
-                union = comps_a.union(comps_b)
-                if union:
-                    jaccard = len(intersection) / len(union)
-                    # Synergistic boost for known Indian culinary spice combinations
-                    if item_b in self._offline_data.get("entities", {}).get(item_a, {}).get("synergistic_pairs", []):
-                        jaccard = max(jaccard, 0.45)
-                    shared_score += min(jaccard * 2.0, 1.0)
-                    total_pairs += 1
-
-        if total_pairs == 0:
-            return 0.50
-        coherence = shared_score / total_pairs
-        return round(min(max(coherence, 0.20), 1.0), 3)
-
-flavordb_client = FlavorDBClient()
+        molecules = []
+        for item in raw_list:
+            if isinstance(item, dict):
+                name = item.get("common_name") or item.get("name") or item.get("compound_name")
+                if name:
+                    molecules.append({
+                        "name": str(name).strip(),
+                        "pubchem_id": item.get("pubchem_id")
+                    })
+        return molecules

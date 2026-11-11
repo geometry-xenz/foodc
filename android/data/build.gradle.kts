@@ -28,7 +28,12 @@ dependencies {
     implementation(project(":domain"))
 
     implementation(libs.retrofit)
+    implementation(libs.kotlinx.serialization.json)
     implementation(libs.kotlinx.coroutines.android)
     implementation(libs.room.runtime)
     implementation(libs.room.ktx)
+    implementation(libs.work.runtime.ktx)
+
+    testImplementation(libs.junit)
+    testImplementation(libs.kotlinx.coroutines.android)
 }

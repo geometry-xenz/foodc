@@ -1,0 +1,55 @@
+# DRISHYAM Third-Party Models, Weights, and Datasets License Inventory
+# Adheres to DRISHYAM Master Specification §4 and S14.
+
+models:
+  - name: "MediaPipe Tasks / LiteRT Runtime"
+    license: "Apache-2.0"
+    source: "https://developers.google.com/mediapipe/solutions/vision"
+    usage: "On-device edge inference pipeline, post-processing, and tensor delegates (GPU/CPU)."
+    verification_status: "VERIFIED_COMPLIANT"
+
+  - name: "EfficientNet-Lite0 / EfficientDet-Lite0"
+    license: "Apache-2.0"
+    source: "https://github.com/google/automl/tree/master/efficientdet"
+    usage: "Produce detection (banana, apple, orange, broccoli, carrot) and ingredient region classification."
+    verification_status: "VERIFIED_COMPLIANT"
+
+  - name: "ML Kit Text Recognition v2"
+    license: "Google Play Services Terms of Service"
+    source: "com.google.android.gms:play-services-mlkit-text-recognition"
+    usage: "Signal 1: Real-time on-device bilingual Latin & Devanagari OCR for packaged spice labels."
+    verification_status: "VERIFIED_COMPLIANT"
+
+datasets:
+  - name: "Mendeley Indian Spices Dataset"
+    license: "CC BY 4.0"
+    source: "https://data.mendeley.com/datasets/p62p5s54z5/1"
+    classes: 19
+    sample_count: 10991
+    usage: "Fine-grained spice classification training and validation."
+    verification_status: "VERIFIED_COMPLIANT"
+
+  - name: "Daffodil Spices Dataset"
+    license: "CC BY 4.0"
+    source: "https://github.com/daffodil-spices"
+    classes: 8
+    sample_count: 4059
+    usage: "Whole seed and powder evaluation."
+    verification_status: "VERIFIED_COMPLIANT"
+
+  - name: "Kaggle Vegetables Dataset"
+    license: "CC BY-SA 4.0"
+    classes: 15
+    sample_count: 21000
+    usage: "Produce recognition benchmarks."
+    verification_status: "VERIFIED_COMPLIANT"
+
+  - name: "SpiceSpectrum"
+    license: "CC BY-ND"
+    status: "EXCLUDED_PROHIBITED"
+    reason: "License prohibits derivative works and modification. Strictly excluded from training and deployment."
+
+  - name: "Ultralytics YOLO (v8/v11)"
+    license: "AGPL-3.0"
+    status: "EXCLUDED_PROHIBITED"
+    reason: "Copyleft AGPL-3.0 infects trained model weights and client applications. MediaPipe/LiteRT (Apache-2.0) used instead."

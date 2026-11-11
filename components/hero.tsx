@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { ArrowDown, ArrowUpRight } from "lucide-react";
 import { Magnetic } from "@/components/magnetic";
@@ -16,6 +16,19 @@ export function Hero({
 }) {
   const videoRef = useRef<HTMLVideoElement>(null);
   const heroRef = useRef<HTMLElement>(null);
+  const [videoSrc, setVideoSrc] = useState("/videos/hero-1080.mp4");
+
+  useEffect(() => {
+    // Pick optimal video source based on screen width and devicePixelRatio
+    const effectiveWidth = window.innerWidth * (window.devicePixelRatio || 1);
+    if (effectiveWidth <= 1280) {
+      setVideoSrc("/videos/hero-720.mp4");
+    } else if (effectiveWidth <= 1920) {
+      setVideoSrc("/videos/hero-1080.mp4");
+    } else {
+      setVideoSrc("/videos/hero-1440.mp4");
+    }
+  }, []);
 
   useEffect(() => {
     const video = videoRef.current;
@@ -60,9 +73,9 @@ export function Hero({
 
       const tick = () => {
         if (!video) return;
-        if (video.readyState >= 2) {
-          current += (target - current) * 0.18;
-          if (Math.abs(target - current) > 0.004) {
+        if (video.readyState >= 2 && !video.seeking) {
+          current += (target - current) * 0.22;
+          if (Math.abs(target - current) > 0.005) {
             try {
               video.currentTime = current;
             } catch {
@@ -82,7 +95,7 @@ export function Hero({
       cancelAnimationFrame(frame);
       scrollTrigger?.kill();
     };
-  }, []);
+  }, [videoSrc]);
 
   return (
     <section
@@ -93,22 +106,23 @@ export function Hero({
       <div className="absolute inset-0">
         <video
           ref={videoRef}
-          className="h-full w-full object-cover opacity-55 sm:opacity-60"
-          src="/videos/drishyam-cinematic.mp4"
-          poster="/images/hero-poster.jpg"
+          className="h-full w-full object-cover opacity-90 transition-opacity duration-500"
+          src={videoSrc}
+          poster="/videos/hero-poster.webp"
           muted
           playsInline
           preload="auto"
           aria-hidden="true"
         />
-        <div className="absolute inset-0 bg-[linear-gradient(90deg,rgba(8,8,8,0.96)_0%,rgba(8,8,8,0.75)_34%,rgba(8,8,8,0.2)_66%,rgba(8,8,8,0.55)_100%)]" />
-        <div className="hero-vignette absolute inset-0" />
+        {/* Crisp text gradient on left only; right side keeps food video bright and punchy */}
+        <div className="absolute inset-0 bg-[linear-gradient(90deg,rgba(8,8,8,0.92)_0%,rgba(8,8,8,0.72)_38%,rgba(8,8,8,0.1)_72%,rgba(8,8,8,0.35)_100%)] pointer-events-none" />
+        <div className="hero-vignette absolute inset-0 pointer-events-none" />
       </div>
 
       <div className="relative z-[2] mx-auto grid w-full max-w-[1380px] grid-cols-1 items-center px-5 sm:px-8">
         <div className="max-w-[760px]">
           <div className="mb-6 flex flex-wrap items-center gap-3">
-            <span className="eyebrow">Computational Gastronomy</span>
+            <span className="eyebrow">THE INTELLIGENT KITCHEN</span>
             <span className="hidden h-px w-10 bg-[rgba(232,181,106,.3)] sm:block" />
             <span className="text-[0.62rem] uppercase tracking-[0.24em] text-[#8B7E6D]">
               Est. 2026 · FlavorDB driven
@@ -116,11 +130,11 @@ export function Hero({
           </div>
 
           <h1 className="hero-title text-balance">
-            See your{" "}
-            <span className="font-display italic text-gold-gradient">ingredients.</span>
+            Your <span className="font-display italic text-gold-gradient">ingredients.</span>
             <br />
-            Discover your{" "}
-            <span className="font-display italic text-gold-gradient">possibilities.</span>
+            Your <span className="font-display italic text-gold-gradient">nutrition.</span>
+            <br />
+            Your next great meal.
           </h1>
 
           <p className="mt-7 max-w-[560px] text-[0.95rem] leading-7 text-[#B3A798] sm:text-[1.02rem]">
@@ -132,13 +146,13 @@ export function Hero({
           <div className="mt-9 flex flex-wrap items-center gap-3.5">
             <Magnetic strength={0.18}>
               <Link href="/app" className="btn btn-gold">
-                Launch your kitchen
+                Start exploring
                 <ArrowUpRight size={16} />
               </Link>
             </Magnetic>
             <Magnetic strength={0.14}>
               <Link href="#scene-1" className="btn btn-ghost">
-                Trace the science
+                Discover how it works
                 <ArrowDown size={15} />
               </Link>
             </Magnetic>
@@ -149,8 +163,10 @@ export function Hero({
               { value: ingredientCount, label: "Pantry ingredients" },
               { value: recipeCount, label: "Molecular recipes" },
               { value: compoundCount, label: "Aroma links" },
-              { value: 6, label: "Metabolic protocols" },
-            ].map((stat) => (
+              { value: 8, label: "Metabolic protocols" },
+            ]
+              .filter((stat) => stat.value > 0)
+              .map((stat) => (
               <div key={stat.label}>
                 <div className="font-display text-[1.85rem] leading-none text-[#F3D3A1]">
                   {stat.value}
@@ -174,7 +190,7 @@ export function Hero({
         </span>
       </div>
 
-      <div className="absolute inset-x-0 bottom-0 z-[2] h-24 bg-gradient-to-t from-[#080808] to-transparent" />
+      <div className="absolute inset-x-0 bottom-0 z-[2] h-24 bg-gradient-to-t from-[#080808] to-transparent pointer-events-none" />
     </section>
   );
 }

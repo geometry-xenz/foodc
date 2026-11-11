@@ -34,7 +34,7 @@ dependencies {
     implementation(libs.camerax.view)
 
     // TensorFlow Lite
-    implementation(libs.tensorflow.lite)
-    implementation(libs.tensorflow.lite.gpu)
-    implementation(libs.tensorflow.lite.support)
+
+    testImplementation(libs.junit)
+    testImplementation(libs.kotlinx.coroutines.android)
 }

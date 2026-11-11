@@ -19,6 +19,6 @@ class ConfirmScannedIngredientUseCase(private val repository: PantryRepository) 
 
 class RecommendRecipesUseCase(private val repository: RecipeRepository) {
     suspend operator fun invoke(diet: String? = null, goal: FitnessGoal? = null): Result<List<Recipe>> {
-        return repository.getRecommendedRecipes(diet, goal)
+        return repository.getRecommendedRecipes(diet = diet, goal = goal)
     }
 }

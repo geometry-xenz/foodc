@@ -1,8 +1,6 @@
 import Link from "next/link";
 import { ArrowUpRight, FlaskConical, Github, Sparkles } from "lucide-react";
 import { Logo } from "@/components/logo";
-import { allCompoundNames } from "@/lib/flavor";
-
 const COMPOUND_MARQUEE = [
   "curcumin",
   "cuminaldehyde",
@@ -19,8 +17,7 @@ const COMPOUND_MARQUEE = [
 ];
 
 export function LandingFooter() {
-  const compounds = allCompoundNames();
-  const marquee = (COMPOUND_MARQUEE.length ? COMPOUND_MARQUEE : compounds).join(" · ");
+  const marquee = COMPOUND_MARQUEE.join(" · ");
   return (
     <footer className="relative">
       <div className="overflow-hidden border-y border-[rgba(232,181,106,.12)] bg-[rgba(255,255,255,.012)] py-3.5">
@@ -50,11 +47,11 @@ export function LandingFooter() {
           <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,rgba(8,8,8,.62),#080808_75%)]" />
         </div>
         <div className="relative mx-auto max-w-[1050px] text-center">
-          <div className="eyebrow mb-6 justify-center before:hidden">Your kitchen is ready</div>
-          <h2 className="font-display text-[clamp(2.8rem,7vw,6.4rem)] font-semibold leading-[0.92] tracking-[-0.03em] text-balance">
-            Your ingredients are already
+          <div className="eyebrow mb-6 justify-center before:hidden">The Intelligent Kitchen</div>
+          <h2 className="font-display text-[clamp(2.4rem,6vw,5.6rem)] font-semibold leading-[0.95] tracking-[-0.03em] text-balance">
+            Make more of what&apos;s already{" "}
             <br />
-            <span className="italic text-gold-gradient">full of possibility.</span>
+            <span className="italic text-gold-gradient">in your kitchen.</span>
           </h2>
           <p className="mx-auto mt-6 max-w-[560px] text-[0.92rem] leading-7 text-[#A79C8D]">
             Step into the workspace where molecular gastronomy meets your
@@ -62,7 +59,7 @@ export function LandingFooter() {
           </p>
           <div className="mt-9 flex flex-wrap items-center justify-center gap-3">
             <Link href="/app" className="btn btn-gold">
-              Launch the workspace <ArrowUpRight size={15} />
+              Launch DRISHYAM <ArrowUpRight size={15} />
             </Link>
             <Link href="/login" className="btn btn-ghost">
               <Sparkles size={14} /> Enter demo kitchen
@@ -75,10 +72,10 @@ export function LandingFooter() {
       </section>
 
       <div className="border-t border-[rgba(232,181,106,.12)] px-5 py-12 sm:px-8">
-        <div className="mx-auto grid max-w-[1280px] gap-10 md:grid-cols-[1.4fr_0.6fr_0.6fr_0.6fr]">
+        <div className="mx-auto grid max-w-[1280px] gap-10 md:grid-cols-[1.2fr_0.7fr_0.7fr_0.7fr_0.7fr]">
           <div>
             <Logo />
-            <p className="mt-5 max-w-[300px] text-[0.72rem] leading-6 text-[#756D62]">
+            <p className="mt-5 max-w-[280px] text-[0.72rem] leading-6 text-[#756D62]">
               Computational gastronomy and personalised nutrition. Molecular
               aroma science translated into what you cook, and what it does for
               you.
@@ -91,11 +88,11 @@ export function LandingFooter() {
           <FooterColumn
             title="Experience"
             links={[
-              { label: "The science", href: "#scene-1" },
-              { label: "Pantry vision", href: "#scene-2" },
-              { label: "Aroma network", href: "#scene-3" },
-              { label: "Nutrition", href: "#scene-4" },
-              { label: "Goal protocols", href: "#scene-5" },
+              { label: "Discover", href: "/features" },
+              { label: "How it works", href: "/how-it-works" },
+              { label: "Flavour Science", href: "/flavour-science" },
+              { label: "Nutrition", href: "/nutrition" },
+              { label: "About", href: "/about" },
             ]}
           />
           <FooterColumn
@@ -109,11 +106,19 @@ export function LandingFooter() {
             ]}
           />
           <FooterColumn
+            title="Company & Legal"
+            links={[
+              { label: "Privacy & Disclosures", href: "/privacy" },
+              { label: "Terms of Service", href: "/terms" },
+              { label: "Contact Laboratory", href: "/contact" },
+            ]}
+          />
+          <FooterColumn
             title="Account"
             links={[
               { label: "Sign in", href: "/login" },
-              { label: "Create account", href: "/login?mode=register" },
-              { label: "Demo kitchen", href: "/login" },
+              { label: "Create account", href: "/register" },
+              { label: "Forgot password", href: "/forgot-password" },
             ]}
           />
         </div>

@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import { Activity, CircleDot, Radar, ScanLine } from "lucide-react";
-import { GOAL_ORDER, GOAL_SPECS, computeNutritionTargets } from "@/lib/goals";
+import { GOAL_ORDER, GOAL_SPECS, computeNutritionTargets } from "@/lib/types";
 import { formatNumber } from "@/lib/utils";
 
 const DETECTIONS = [
