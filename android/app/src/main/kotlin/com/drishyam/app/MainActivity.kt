@@ -204,6 +204,8 @@ class MainActivity : ComponentActivity() {
                         composable("auth") {
                             AuthScreen(
                                 authRepository = app.authRepository,
+                                initialBaseUrl = app.getBaseUrl(),
+                                onUpdateBaseUrl = { newUrl -> app.setBaseUrl(newUrl) },
                                 onAuthSuccess = {
                                     navController.navigate("onboarding") {
                                         popUpTo("auth") { inclusive = true }

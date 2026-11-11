@@ -211,7 +211,7 @@ interface DrishyamApiService {
     @POST("api/auth/register")
     suspend fun register(@Body body: RegisterRequest): Response<AuthResponse>
 
-    @POST("api/auth/demo")
+    @POST("api/auth/demo?client=android")
     suspend fun loginDemo(): Response<AuthResponse>
 
     @POST("api/auth/logout")

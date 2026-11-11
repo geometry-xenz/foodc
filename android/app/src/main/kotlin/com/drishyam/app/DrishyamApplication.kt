@@ -1,6 +1,7 @@
 package com.drishyam.app
 
 import android.app.Application
+import android.content.Context
 import androidx.room.Room
 import com.drishyam.core.database.DrishyamDatabase
 import com.drishyam.core.network.DrishyamApiService
@@ -49,22 +50,24 @@ class DrishyamApplication : Application() {
     lateinit var confirmScannedIngredientUseCase: ConfirmScannedIngredientUseCase
     lateinit var recommendRecipesUseCase: RecommendRecipesUseCase
 
-    override fun onCreate() {
-        super.onCreate()
+    fun getBaseUrl(): String {
+        val prefs = getSharedPreferences("drishyam_prefs", Context.MODE_PRIVATE)
+        return prefs.getString("server_base_url", "http://10.0.2.2:8000/") ?: "http://10.0.2.2:8000/"
+    }
 
-        // 1. Token Manager
-        tokenManager = SharedPreferencesTokenManager(applicationContext)
+    fun setBaseUrl(newUrl: String) {
+        val formatted = if (newUrl.trim().endsWith("/")) newUrl.trim() else "${newUrl.trim()}/"
+        getSharedPreferences("drishyam_prefs", Context.MODE_PRIVATE)
+            .edit()
+            .putString("server_base_url", formatted)
+            .apply()
+        initServices(formatted)
+    }
 
-        // 2. Room Local Database (Offline-First)
-        database = Room.databaseBuilder(
-            applicationContext,
-            DrishyamDatabase::class.java,
-            "drishyam_android.db"
-        ).fallbackToDestructiveMigration().build()
-
+    fun initServices(baseUrl: String) {
         // 3. API Service with Refresh Authenticator & Auth Interceptor
         apiService = NetworkClient.createApiService(
-            baseUrl = "http://10.0.2.2:8000/",
+            baseUrl = baseUrl,
             tokenManager = tokenManager,
             isDebug = true
         )
@@ -84,5 +87,21 @@ class DrishyamApplication : Application() {
         getPantryUseCase = GetPantryUseCase(pantryRepository)
         confirmScannedIngredientUseCase = ConfirmScannedIngredientUseCase(pantryRepository)
         recommendRecipesUseCase = RecommendRecipesUseCase(recipeRepository)
+    }
+
+    override fun onCreate() {
+        super.onCreate()
+
+        // 1. Token Manager
+        tokenManager = SharedPreferencesTokenManager(applicationContext)
+
+        // 2. Room Local Database (Offline-First)
+        database = Room.databaseBuilder(
+            applicationContext,
+            DrishyamDatabase::class.java,
+            "drishyam_android.db"
+        ).fallbackToDestructiveMigration().build()
+
+        initServices(getBaseUrl())
     }
 }

@@ -176,6 +176,7 @@ async def login(
 @router.post("/demo", response_model=AuthResponse)
 async def login_demo(
     response: Response,
+    client: str = "web",
     db: AsyncSession = Depends(get_db),
 ):
     stmt = select(User).where(User.email == "demo@drishyam.ai")
@@ -185,21 +186,41 @@ async def login_demo(
     if not user:
         raise NotFoundException("Demo account not found. Please run seed script.")
 
-    raw_tok, tok_h, exp = create_web_session()
-    session = AuthSession(
-        user_id=user.id,
-        client="web",
-        session_hash=tok_h,
-        access_expires_at=exp,
-        refresh_expires_at=exp,
-    )
-    db.add(session)
-    await db.commit()
-    set_session_cookie(response, raw_tok)
-    return AuthResponse(
-        user=UserResponse(id=user.id, email=user.email, name=user.name),
-        client="web",
-    )
+    if client == "android":
+        raw_acc, acc_h, raw_ref, ref_h, acc_exp, ref_exp = create_android_token_pair()
+        session = AuthSession(
+            user_id=user.id,
+            client="android",
+            access_hash=acc_h,
+            refresh_hash=ref_h,
+            access_expires_at=acc_exp,
+            refresh_expires_at=ref_exp,
+        )
+        db.add(session)
+        await db.commit()
+        return AuthResponse(
+            user=UserResponse(id=user.id, email=user.email, name=user.name),
+            client="android",
+            access_token=raw_acc,
+            refresh_token=raw_ref,
+            expires_in=900,
+        )
+    else:
+        raw_tok, tok_h, exp = create_web_session()
+        session = AuthSession(
+            user_id=user.id,
+            client="web",
+            session_hash=tok_h,
+            access_expires_at=exp,
+            refresh_expires_at=exp,
+        )
+        db.add(session)
+        await db.commit()
+        set_session_cookie(response, raw_tok)
+        return AuthResponse(
+            user=UserResponse(id=user.id, email=user.email, name=user.name),
+            client="web",
+        )
 
 
 @router.post("/refresh", response_model=AuthResponse)
