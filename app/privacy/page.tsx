@@ -29,10 +29,8 @@ export default function PrivacyPage() {
             </h2>
           </div>
           <p className="text-sm leading-relaxed text-[#B3A798]">
-            The DRISHYAM Android camera scanner performs all standard OCR and produce detection
-            <strong> strictly on your local device</strong> using ML Kit (Latin & Devanagari) and
-            Google LiteRT (formerly TensorFlow Lite). No continuous video feeds or live viewfinder
-            frames are ever streamed, saved, or uploaded to any cloud server.
+            The DRISHYAM camera scanner and Vision pipeline process image frames with privacy-first
+            principles. No continuous video feeds or live viewfinder frames are ever continuously streamed or stored without user action.
           </p>
         </section>
 
@@ -46,7 +44,7 @@ export default function PrivacyPage() {
             </h2>
           </div>
           <p className="text-sm leading-relaxed text-[#B3A798]">
-            When you explicitly choose to use the <em>Deep Inspect</em> feature on Android:
+            When you explicitly choose to use the <em>Deep Inspect</em> feature:
           </p>
           <ul className="mt-4 space-y-2.5 text-xs leading-relaxed text-[#D1C7BA]">
             <li className="flex items-start gap-2">

@@ -15,7 +15,6 @@ import {
   Package,
   Settings2,
   ShoppingCart,
-  Smartphone,
   Sparkles,
   Target,
   User,
@@ -27,7 +26,6 @@ import { cn } from "@/lib/utils";
 
 const NAV = [
   { href: "/app", label: "Dashboard", icon: Home, hint: "Kitchen overview" },
-  { href: "/app/android", label: "Android App", icon: Smartphone, hint: "Live AI Scanner" },
   { href: "/app/pantry", label: "Pantry", icon: Package, hint: "Detected stock" },
   { href: "/app/recipes", label: "Recipes", icon: UtensilsCrossed, hint: "Ranked matches" },
   { href: "/app/meal-planner", label: "Meal Planner", icon: CalendarDays, hint: "Day protocol" },
@@ -193,14 +191,7 @@ export function AppShell({
           </div>
 
           <div className="flex items-center gap-2 sm:gap-3">
-            <Link
-              href="/app/android"
-              className="flex items-center gap-1.5 rounded-full border border-[#FF8A32]/35 bg-[#FF8A32]/10 px-2.5 py-1 text-[0.52rem] font-semibold uppercase tracking-[0.14em] text-[#F3D3A1] transition-colors hover:border-[#FF8A32]"
-            >
-              <Smartphone size={11} className="text-[#FF8A32]" />
-              <span>Android App</span>
-            </Link>
-            <div className="hidden items-center gap-1.5 rounded-full border border-[rgba(143,169,137,.22)] bg-[rgba(143,169,137,.06)] px-2.5 py-1 sm:flex">
+            <div className="flex items-center gap-1.5 rounded-full border border-[rgba(143,169,137,.22)] bg-[rgba(143,169,137,.06)] px-2.5 py-1">
               <span className="h-1.5 w-1.5 rounded-full bg-[#8FA989]" />
               <span className="text-[0.46rem] uppercase tracking-[0.14em] text-[#AFC3AA]">
                 Engine live

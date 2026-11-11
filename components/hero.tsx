@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
-import { ArrowDown, ArrowUpRight, Smartphone } from "lucide-react";
+import { ArrowDown, ArrowUpRight } from "lucide-react";
 import { Magnetic } from "@/components/magnetic";
 
 export function Hero({
@@ -148,15 +148,6 @@ export function Hero({
               <Link href="/app" className="btn btn-gold">
                 Start exploring
                 <ArrowUpRight size={16} />
-              </Link>
-            </Magnetic>
-            <Magnetic strength={0.16}>
-              <Link
-                href="/android"
-                className="btn btn-ghost border-[#FF8A32]/40 bg-[#FF8A32]/10 text-[#F6EFE4] hover:border-[#FF8A32]"
-              >
-                <Smartphone size={15} className="text-[#FF8A32]" />
-                Run Android Scanner App
               </Link>
             </Magnetic>
             <Magnetic strength={0.14}>

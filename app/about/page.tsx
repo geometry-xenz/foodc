@@ -54,8 +54,8 @@ export default function AboutPage() {
           </div>
           <h3 className="font-display text-lg font-semibold text-[#F6EFE4]">Engine-Driven</h3>
           <p className="mt-2 text-xs leading-relaxed text-[#8B7E6D]">
-            Single FastAPI & PostgreSQL engine serving deterministic 3D Fibonacci aroma graphs,
-            gastronomic ranking scores, and metabolic targets across web and native Android.
+            Single FastAPI & Next.js engine serving deterministic 3D Fibonacci aroma graphs,
+            gastronomic ranking scores, and metabolic targets across all clients.
           </p>
         </div>
 

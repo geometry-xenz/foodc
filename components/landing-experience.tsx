@@ -1,8 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { ArrowUpRight, Smartphone } from "lucide-react";
-import { Preloader } from "@/components/preloader";
+import { ArrowUpRight } from "lucide-react";
 import { LandingNav } from "@/components/landing-nav";
 import { Hero } from "@/components/hero";
 import { SceneShell } from "@/components/scene-shell";
@@ -26,7 +25,6 @@ export function LandingExperience({
 }) {
   return (
     <>
-      <Preloader />
       <LandingNav />
       <main>
         <Hero
@@ -138,19 +136,12 @@ export function LandingExperience({
               <span className="italic text-gold-gradient">your kitchen.</span>
             </h2>
             <p className="mx-auto mt-5 max-w-[600px] text-sm leading-7 text-[#A99C8C] sm:text-base">
-              Scan your shelves with the Android companion or step straight into the computational gastronomy workspace on the web.
+              Step straight into the computational gastronomy workspace on the web to explore molecular pairing and metabolic targets.
             </p>
             <div className="mt-9 flex flex-wrap items-center justify-center gap-4">
               <Link href="/app" className="btn btn-gold">
                 Start exploring
                 <ArrowUpRight size={16} />
-              </Link>
-              <Link
-                href="/android"
-                className="btn btn-ghost border-[#FF8A32]/40 bg-[#FF8A32]/10 text-[#F6EFE4] hover:border-[#FF8A32]"
-              >
-                <Smartphone size={15} className="text-[#FF8A32]" />
-                Run Android App
               </Link>
             </div>
           </div>

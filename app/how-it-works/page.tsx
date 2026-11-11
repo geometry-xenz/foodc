@@ -14,9 +14,9 @@ export default function HowItWorksPage() {
       num: "01",
       icon: ScanLine,
       title: "Live Kitchen Vision & Label OCR",
-      tagline: "Android CameraX · MediaPipe · Offline ML Kit",
+      tagline: "Multimodal Gemini Vision · Label OCR · Fresh Produce Detection",
       description:
-        "Point your phone at pantry shelves, spice containers, or market hauls. DRISHYAM’s real-time Android scanner runs Devanagari and Latin OCR alias matching (haldi → turmeric, jeera → cumin) alongside local produce detection. Detections accumulate with temporal stability smoothing before you confirm them.",
+        "Point your camera at pantry shelves, spice containers, or market hauls. DRISHYAM’s real-time vision pipeline runs Devanagari and Latin OCR alias matching (haldi → turmeric, jeera → cumin) alongside produce detection. Detections accumulate with confidence scoring before you confirm them into your pantry.",
       image: "/images/keyframes/02-ai-scanning.webp",
     },
     {

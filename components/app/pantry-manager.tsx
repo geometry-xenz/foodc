@@ -302,21 +302,21 @@ export function PantryManager({
               <div className="flex items-center gap-2">
                 <ScanEye size={14} className="text-[#FF8A32]" />
                 <h2 className="text-[0.55rem] font-semibold uppercase tracking-[0.18em] text-[#D9C7AE]">
-                  Live Mobile Scanner
+                  Live Vision Scanner
                 </h2>
               </div>
-              <span className="chip chip-gold !py-0.5 text-[0.44rem]">Android</span>
+              <span className="chip chip-gold !py-0.5 text-[0.44rem]">Vision API</span>
             </div>
             <div className="mt-3 rounded-xl border border-[rgba(232,181,106,.13)] bg-[rgba(8,8,8,.6)] p-3 text-center">
               <div className="font-display text-[1.1rem] leading-snug text-[#F3D3A1]">
-                On-device Computer Vision
+                Gemini Vision Pipeline
               </div>
               <p className="mt-1.5 text-[0.62rem] leading-relaxed text-[#A99F91]">
-                Use the native DRISHYAM Android app to point your camera at spices, containers and pantry staples. Items recognized via OCR, local edge models, or Deep Inspect sync to your web inventory in real time.
+                Scan spices, produce and pantry staples using the Gemini Vision API at /api/vision/identify. Items recognized via OCR and multi-modal models sync to your inventory in real time.
               </p>
             </div>
             <div className="mt-3 flex items-center justify-between text-[0.55rem] text-[#756D62]">
-              <span>Sources: Android Scanner · Manual · Deep Inspect</span>
+              <span>Sources: Vision API · Manual · Deep Inspect</span>
             </div>
           </section>
         </div>
