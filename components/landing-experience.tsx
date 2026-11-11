@@ -1,5 +1,7 @@
 "use client";
 
+import Link from "next/link";
+import { ArrowUpRight, Smartphone } from "lucide-react";
 import { Preloader } from "@/components/preloader";
 import { LandingNav } from "@/components/landing-nav";
 import { Hero } from "@/components/hero";
@@ -121,11 +123,38 @@ export function LandingExperience({
               <span className="italic text-gold-gradient">Change the math.</span>
             </>
           }
-          description="Six evidence-based protocols, one metabolic engine. Every protocol recalculates calories and protein from your bodyweight, then redistributes carbohydrate and fat to match the physiological objective."
+          description="Eight evidence-based protocols, one metabolic engine. Every protocol recalculates calories and protein from your bodyweight, then redistributes carbohydrate and fat to match the physiological objective."
           stacked
         >
           <GoalsScene />
         </SceneShell>
+
+        <section className="relative overflow-hidden border-t border-[rgba(232,181,106,.12)] py-24 sm:py-32">
+          <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_55%_50%_at_50%_50%,rgba(255,138,50,.09),transparent_70%)]" />
+          <div className="relative mx-auto max-w-[960px] px-5 text-center sm:px-8">
+            <span className="eyebrow">THE INTELLIGENT KITCHEN</span>
+            <h2 className="mt-5 font-display text-4xl leading-[1.02] text-[#F6EFE4] sm:text-6xl">
+              Make more of what&apos;s already in{" "}
+              <span className="italic text-gold-gradient">your kitchen.</span>
+            </h2>
+            <p className="mx-auto mt-5 max-w-[600px] text-sm leading-7 text-[#A99C8C] sm:text-base">
+              Scan your shelves with the Android companion or step straight into the computational gastronomy workspace on the web.
+            </p>
+            <div className="mt-9 flex flex-wrap items-center justify-center gap-4">
+              <Link href="/app" className="btn btn-gold">
+                Start exploring
+                <ArrowUpRight size={16} />
+              </Link>
+              <Link
+                href="/android"
+                className="btn btn-ghost border-[#FF8A32]/40 bg-[#FF8A32]/10 text-[#F6EFE4] hover:border-[#FF8A32]"
+              >
+                <Smartphone size={15} className="text-[#FF8A32]" />
+                Run Android App
+              </Link>
+            </div>
+          </div>
+        </section>
       </main>
       <LandingFooter />
     </>

@@ -11,33 +11,46 @@ export function Preloader() {
   useEffect(() => {
     if (started.current) return;
     started.current = true;
-    const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    const isAutostart =
+      typeof window !== "undefined" &&
+      new URLSearchParams(window.location.search).get("autostart") === "1";
+    const reduced =
+      isAutostart ||
+      window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+    if (isAutostart) {
+      setProgress(100);
+      setDone(true);
+      document.documentElement.style.overflow = "";
+      return;
+    }
+
     document.documentElement.style.overflow = "hidden";
 
     if (reduced) {
       setProgress(100);
-      const t = window.setTimeout(() => finish(), 300);
+      const t = window.setTimeout(() => finish(), 150);
       return () => window.clearTimeout(t);
     }
 
     let current = 0;
     const interval = window.setInterval(() => {
-      current = Math.min(current + Math.random() * 13 + 4, 92);
+      current = Math.min(current + Math.random() * 24 + 12, 95);
       setProgress(current);
-    }, 110);
+    }, 65);
 
     const onLoad = () => {
       window.clearInterval(interval);
       setProgress(100);
-      window.setTimeout(finish, 520);
+      window.setTimeout(finish, 260);
     };
 
     if (document.readyState === "complete") {
-      window.setTimeout(onLoad, 500);
+      window.setTimeout(onLoad, 220);
     } else {
       window.addEventListener("load", onLoad, { once: true });
     }
-    const fallback = window.setTimeout(onLoad, 4200);
+    const fallback = window.setTimeout(onLoad, 1100);
 
     function finish() {
       setDone(true);

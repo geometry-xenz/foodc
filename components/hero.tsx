@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
-import { ArrowDown, ArrowUpRight } from "lucide-react";
+import { ArrowDown, ArrowUpRight, Smartphone } from "lucide-react";
 import { Magnetic } from "@/components/magnetic";
 
 export function Hero({
@@ -137,10 +137,10 @@ export function Hero({
             Your next great meal.
           </h1>
 
-          <p className="mt-7 max-w-[560px] text-[0.95rem] leading-7 text-[#B3A798] sm:text-[1.02rem]">
-            DRISHYAM reads the molecular language of your kitchen — profiling
-            volatile aromatics, ranking what you can cook right now, and
-            translating every plate into precise metabolic targets.
+          <p className="mt-7 max-w-[580px] text-[0.95rem] leading-7 text-[#B3A798] sm:text-[1.02rem]">
+            Discover what you can cook, understand the science of flavour and
+            make every meal work towards your goals — reading volatile aromatics
+            and ranking what you can cook right now.
           </p>
 
           <div className="mt-9 flex flex-wrap items-center gap-3.5">
@@ -148,6 +148,15 @@ export function Hero({
               <Link href="/app" className="btn btn-gold">
                 Start exploring
                 <ArrowUpRight size={16} />
+              </Link>
+            </Magnetic>
+            <Magnetic strength={0.16}>
+              <Link
+                href="/android"
+                className="btn btn-ghost border-[#FF8A32]/40 bg-[#FF8A32]/10 text-[#F6EFE4] hover:border-[#FF8A32]"
+              >
+                <Smartphone size={15} className="text-[#FF8A32]" />
+                Run Android Scanner App
               </Link>
             </Magnetic>
             <Magnetic strength={0.14}>

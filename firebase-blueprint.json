@@ -1,0 +1,84 @@
+{
+  "entities": {
+    "UserProfile": {
+      "title": "UserProfile",
+      "description": "User biometric profile, nutritional targets, and lifestyle preferences",
+      "type": "object",
+      "properties": {
+        "uid": { "type": "string" },
+        "email": { "type": "string", "format": "email" },
+        "displayName": { "type": "string" },
+        "weightKg": { "type": "number" },
+        "heightCm": { "type": "number" },
+        "age": { "type": "integer" },
+        "gender": { "type": "string", "enum": ["male", "female", "other"] },
+        "activityLevel": { "type": "string", "enum": ["sedentary", "light", "moderate", "active", "very_active"] },
+        "primaryGoal": { "type": "string" },
+        "bmi": { "type": "number" },
+        "bmr": { "type": "number" },
+        "tdee": { "type": "number" },
+        "targetCalories": { "type": "number" },
+        "targetProteinG": { "type": "number" },
+        "targetCarbsG": { "type": "number" },
+        "targetFatG": { "type": "number" },
+        "targetFibreG": { "type": "number" },
+        "createdAt": { "type": "string" },
+        "updatedAt": { "type": "string" }
+      },
+      "required": ["uid", "email"]
+    },
+    "PantryItem": {
+      "title": "PantryItem",
+      "description": "Verified ingredients in the user's kitchen pantry",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "userId": { "type": "string" },
+        "name": { "type": "string" },
+        "displayName": { "type": "string" },
+        "category": { "type": "string" },
+        "quantity": { "type": "number" },
+        "unit": { "type": "string" },
+        "isAvailable": { "type": "boolean" },
+        "confidence": { "type": "number" },
+        "source": { "type": "string" },
+        "updatedAt": { "type": "string" }
+      },
+      "required": ["id", "userId", "name"]
+    },
+    "MealLog": {
+      "title": "MealLog",
+      "description": "Logged meal with full macro and micronutrient breakdown",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "userId": { "type": "string" },
+        "recipeId": { "type": "string" },
+        "recipeTitle": { "type": "string" },
+        "mealType": { "type": "string" },
+        "portions": { "type": "number" },
+        "calories": { "type": "number" },
+        "proteinG": { "type": "number" },
+        "carbsG": { "type": "number" },
+        "fatG": { "type": "number" },
+        "fibreG": { "type": "number" },
+        "timestamp": { "type": "string" }
+      },
+      "required": ["id", "userId", "recipeTitle", "calories"]
+    }
+  },
+  "firestore": {
+    "/users/{userId}": {
+      "schema": "UserProfile",
+      "description": "User profile with calculated biometrics and macro/micro targets"
+    },
+    "/users/{userId}/pantry/{itemId}": {
+      "schema": "PantryItem",
+      "description": "Real-time synchronized pantry ingredients per user"
+    },
+    "/users/{userId}/mealLogs/{logId}": {
+      "schema": "MealLog",
+      "description": "Nutritional meal records per user"
+    }
+  }
+}

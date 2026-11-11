@@ -36,12 +36,16 @@ export const viewport: Viewport = {
   initialScale: 1,
 };
 
+import { FirebaseProvider } from "@/components/firebase-provider";
+
 export default function RootLayout({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
   return (
     <html lang="en" data-scroll-behavior="smooth">
-      <body>{children}</body>
+      <body>
+        <FirebaseProvider>{children}</FirebaseProvider>
+      </body>
     </html>
   );
 }

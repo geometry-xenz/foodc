@@ -2,7 +2,6 @@ package com.drishyam.app.screens
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -25,8 +24,6 @@ import androidx.compose.material.icons.filled.Lock
 import androidx.compose.material.icons.filled.Mail
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.Restaurant
-import androidx.compose.material.icons.filled.Settings
-import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CircularProgressIndicator
@@ -73,8 +70,6 @@ enum class AuthMode {
 @Composable
 fun AuthScreen(
     authRepository: AuthRepository,
-    initialBaseUrl: String = "http://10.0.2.2:8000/",
-    onUpdateBaseUrl: (String) -> Unit = {},
     onAuthSuccess: () -> Unit
 ) {
     var mode by remember { mutableStateOf(AuthMode.LOGIN) }
@@ -84,10 +79,6 @@ fun AuthScreen(
     var isLoading by remember { mutableStateOf(false) }
     var errorMessage by remember { mutableStateOf<String?>(null) }
     var infoMessage by remember { mutableStateOf<String?>(null) }
-
-    var currentServerUrl by remember { mutableStateOf(initialBaseUrl) }
-    var showServerConfigDialog by remember { mutableStateOf(false) }
-    var serverInputUrl by remember { mutableStateOf(initialBaseUrl) }
 
     val scope = rememberCoroutineScope()
 
@@ -266,25 +257,12 @@ fun AuthScreen(
                                     AuthMode.LOGIN -> {
                                         val res = authRepository.login(email.trim(), password)
                                         isLoading = false
-                                        if (res.isSuccess) {
-                                            onAuthSuccess()
-                                        } else {
-                                            val err = res.exceptionOrNull()?.message ?: "Invalid email or password"
-                                            errorMessage = if (err.contains("Failed to connect") || err.contains("Unable to resolve")) {
-                                                "$err\nTip: If on phone, tap 'Server' below to set PC Wi-Fi IP."
-                                            } else {
-                                                err
-                                            }
-                                        }
+                                        if (res.isSuccess) onAuthSuccess() else errorMessage = "Invalid email or password"
                                     }
                                     AuthMode.REGISTER -> {
                                         val res = authRepository.register(email.trim(), password, name.ifBlank { null })
                                         isLoading = false
-                                        if (res.isSuccess) {
-                                            onAuthSuccess()
-                                        } else {
-                                            errorMessage = res.exceptionOrNull()?.message ?: "Registration failed."
-                                        }
+                                        if (res.isSuccess) onAuthSuccess() else errorMessage = "Registration failed. Password must be >= 8 chars."
                                     }
                                     AuthMode.FORGOT_PASSWORD -> {
                                         val res = authRepository.forgotPassword(email.trim())
@@ -325,16 +303,7 @@ fun AuthScreen(
                                 scope.launch {
                                     val res = authRepository.loginDemo()
                                     isLoading = false
-                                    if (res.isSuccess) {
-                                        onAuthSuccess()
-                                    } else {
-                                        val err = res.exceptionOrNull()?.message ?: "Demo login failed."
-                                        errorMessage = if (err.contains("Failed to connect") || err.contains("Unable to resolve")) {
-                                            "$err\nTip: If on phone, tap 'Server' below to set PC Wi-Fi IP."
-                                        } else {
-                                            err
-                                        }
-                                    }
+                                    if (res.isSuccess) onAuthSuccess() else errorMessage = "Demo login failed."
                                 }
                             },
                             modifier = Modifier.fillMaxWidth().height(48.dp),
@@ -375,107 +344,7 @@ fun AuthScreen(
                             }
                         }
                     }
-
-                    Spacer(modifier = Modifier.height(8.dp))
-
-                    // Server Endpoint Pill (Tap to configure for emulator / Wi-Fi phone)
-                    Row(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .clickable {
-                                serverInputUrl = currentServerUrl
-                                showServerConfigDialog = true
-                            }
-                            .padding(vertical = 6.dp),
-                        horizontalArrangement = Arrangement.Center,
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        Icon(Icons.Default.Settings, contentDescription = null, tint = TextMuted, modifier = Modifier.size(14.dp))
-                        Spacer(modifier = Modifier.width(6.dp))
-                        Text(
-                            text = "Server: $currentServerUrl",
-                            color = TextMuted,
-                            fontSize = 11.sp,
-                            fontFamily = FontFamily.Monospace
-                        )
-                    }
                 }
-            }
-
-            // Server Configuration Dialog
-            if (showServerConfigDialog) {
-                AlertDialog(
-                    onDismissRequest = { showServerConfigDialog = false },
-                    title = { Text("Configure Backend Server", color = TextPrimary, fontSize = 16.sp) },
-                    text = {
-                        Column {
-                            Text(
-                                text = "Choose a preset or enter the host URL of the FastAPI backend running on your PC:",
-                                color = TextSecondary,
-                                fontSize = 12.sp
-                            )
-                            Spacer(modifier = Modifier.height(10.dp))
-                            OutlinedTextField(
-                                value = serverInputUrl,
-                                onValueChange = { serverInputUrl = it },
-                                label = { Text("Server Base URL", color = TextSecondary) },
-                                singleLine = true,
-                                modifier = Modifier.fillMaxWidth(),
-                                colors = OutlinedTextFieldDefaults.colors(
-                                    focusedTextColor = TextPrimary,
-                                    unfocusedTextColor = TextPrimary,
-                                    focusedBorderColor = MoltenOrange,
-                                    unfocusedBorderColor = SurfaceBorder
-                                )
-                            )
-                            Spacer(modifier = Modifier.height(12.dp))
-                            Text("Presets:", color = TextMuted, fontSize = 11.sp)
-                            Spacer(modifier = Modifier.height(4.dp))
-                            Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(6.dp)) {
-                                Button(
-                                    onClick = { serverInputUrl = "http://10.0.2.2:8000/" },
-                                    colors = ButtonDefaults.buttonColors(containerColor = DeepCharcoal),
-                                    modifier = Modifier.weight(1f)
-                                ) {
-                                    Text("Emulator", fontSize = 10.sp, color = TextPrimary)
-                                }
-                                Button(
-                                    onClick = { serverInputUrl = "http://192.168.1.14:8000/" },
-                                    colors = ButtonDefaults.buttonColors(containerColor = DeepCharcoal),
-                                    modifier = Modifier.weight(1f)
-                                ) {
-                                    Text("PC Wi-Fi", fontSize = 10.sp, color = SaffronGlow)
-                                }
-                                Button(
-                                    onClick = { serverInputUrl = "http://127.0.0.1:8000/" },
-                                    colors = ButtonDefaults.buttonColors(containerColor = DeepCharcoal),
-                                    modifier = Modifier.weight(1f)
-                                ) {
-                                    Text("USB Reverse", fontSize = 10.sp, color = TextPrimary)
-                                }
-                            }
-                        }
-                    },
-                    confirmButton = {
-                        Button(
-                            onClick = {
-                                val cleanUrl = if (serverInputUrl.trim().endsWith("/")) serverInputUrl.trim() else "${serverInputUrl.trim()}/"
-                                currentServerUrl = cleanUrl
-                                onUpdateBaseUrl(cleanUrl)
-                                showServerConfigDialog = false
-                            },
-                            colors = ButtonDefaults.buttonColors(containerColor = MoltenOrange)
-                        ) {
-                            Text("Apply", color = ObsidianBlack, fontWeight = FontWeight.Bold)
-                        }
-                    },
-                    dismissButton = {
-                        TextButton(onClick = { showServerConfigDialog = false }) {
-                            Text("Cancel", color = TextSecondary)
-                        }
-                    },
-                    containerColor = DeepCharcoal
-                )
             }
         }
     }

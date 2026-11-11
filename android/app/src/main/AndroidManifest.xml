@@ -15,7 +15,6 @@
     <application
         android:name=".DrishyamApplication"
         android:allowBackup="true"
-        android:usesCleartextTraffic="true"
         android:icon="@android:drawable/sym_def_app_icon"
         android:label="DRISHYAM"
         android:roundIcon="@android:drawable/sym_def_app_icon"

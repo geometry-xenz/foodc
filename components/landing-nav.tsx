@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
-import { Menu, X, Sparkles } from "lucide-react";
+import { Menu, Smartphone, Sparkles, X } from "lucide-react";
 import { Logo } from "@/components/logo";
 
 const LINKS = [
@@ -52,9 +52,16 @@ export function LandingNav() {
           <div className="hidden items-center gap-2.5 sm:flex">
             <Link
               href="/login"
-              className="px-3 text-[0.72rem] font-medium uppercase tracking-[0.12em] text-[#A79C8D] transition-colors hover:text-[#F6EFE4]"
+              className="px-2.5 text-[0.72rem] font-medium uppercase tracking-[0.12em] text-[#A79C8D] transition-colors hover:text-[#F6EFE4]"
             >
               Sign in
+            </Link>
+            <Link
+              href="/android"
+              className="btn btn-ghost btn-sm border-[#FF8A32]/35 text-[#F3D3A1] hover:border-[#FF8A32]"
+            >
+              <Smartphone size={13} className="text-[#FF8A32]" />
+              Run Android App
             </Link>
             <Link href="/app" className="btn btn-gold btn-sm">
               <Sparkles size={13} />
@@ -63,6 +70,10 @@ export function LandingNav() {
           </div>
 
           <div className="flex items-center gap-2 sm:hidden">
+            <Link href="/android" className="btn btn-ghost btn-sm px-2.5">
+              <Smartphone size={13} className="text-[#FF8A32]" />
+              Android
+            </Link>
             <Link href="/app" className="btn btn-gold btn-sm">
               Launch
             </Link>
@@ -96,9 +107,16 @@ export function LandingNav() {
               </a>
             ))}
             <Link
+              href="/android"
+              onClick={() => setOpen(false)}
+              className="mt-6 flex items-center justify-between border border-[#FF8A32]/40 bg-[#FF8A32]/10 px-4 py-4 text-sm font-semibold uppercase tracking-[0.16em] text-[#F3D3A1]"
+            >
+              Run Android App (Live Scanner)
+            </Link>
+            <Link
               href="/login"
               onClick={() => setOpen(false)}
-              className="mt-6 flex items-center justify-between border border-[rgba(232,181,106,.22)] px-4 py-4 text-sm uppercase tracking-[0.16em] text-[#E8B56A]"
+              className="mt-3 flex items-center justify-between border border-[rgba(232,181,106,.22)] px-4 py-4 text-sm uppercase tracking-[0.16em] text-[#E8B56A]"
             >
               Sign in
             </Link>
