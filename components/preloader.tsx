@@ -11,44 +11,23 @@ export function Preloader() {
   useEffect(() => {
     if (started.current) return;
     started.current = true;
-    const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-    document.documentElement.style.overflow = "hidden";
 
-    if (reduced) {
-      setProgress(100);
-      const t = window.setTimeout(() => finish(), 300);
-      return () => window.clearTimeout(t);
-    }
-
-    let current = 0;
-    const interval = window.setInterval(() => {
-      current = Math.min(current + Math.random() * 13 + 4, 92);
-      setProgress(current);
-    }, 110);
-
-    const onLoad = () => {
-      window.clearInterval(interval);
-      setProgress(100);
-      window.setTimeout(finish, 520);
-    };
-
-    if (document.readyState === "complete") {
-      window.setTimeout(onLoad, 500);
-    } else {
-      window.addEventListener("load", onLoad, { once: true });
-    }
-    const fallback = window.setTimeout(onLoad, 4200);
-
-    function finish() {
-      setDone(true);
+    // Immediately ensure overflow is never locked
+    if (typeof document !== "undefined") {
       document.documentElement.style.overflow = "";
     }
+
+    // Dismiss smoothly and swiftly (within 250ms max)
+    const timer = setTimeout(() => {
+      setProgress(100);
+      setDone(true);
+    }, 220);
 
     return () => {
-      window.clearInterval(interval);
-      window.clearTimeout(fallback);
-      window.removeEventListener("load", onLoad);
-      document.documentElement.style.overflow = "";
+      clearTimeout(timer);
+      if (typeof document !== "undefined") {
+        document.documentElement.style.overflow = "";
+      }
     };
   }, []);
 

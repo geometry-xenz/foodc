@@ -21,8 +21,8 @@ export default function FeaturesPage() {
   const featureList = [
     {
       icon: Scan,
-      title: "Real-Time Android Scanner",
-      desc: "Native CameraX pipeline with ML Kit Latin & Devanagari OCR, produce detection, temporal accumulator, and Deep Inspect consent sheet.",
+      title: "Real-Time Vision Scanner",
+      desc: "Gemini Vision and OCR pipeline with multi-language recognition, produce detection, confidence scoring, and Deep Inspect fallback.",
     },
     {
       icon: Sparkles,
@@ -56,8 +56,8 @@ export default function FeaturesPage() {
     },
     {
       icon: Smartphone,
-      title: "Cross-Platform Sync Engine",
-      desc: "Opaque cursor pagination with idempotent sync_ops and server-authoritative conflict resolution between web and Android.",
+      title: "Real-Time Cloud Sync Engine",
+      desc: "Opaque cursor pagination with idempotent sync_ops and server-authoritative conflict resolution across all sessions.",
     },
   ];
 
@@ -96,7 +96,7 @@ export default function FeaturesPage() {
             Ready to explore DRISHYAM?
           </h3>
           <p className="mt-1 text-xs text-[#A79C8D]">
-            Start with the live interactive web workspace or download the native Android app.
+            Start with the live interactive web workspace to explore molecular pairing and metabolic nutrition.
           </p>
         </div>
         <Link href="/app" className="btn btn-gold shrink-0">

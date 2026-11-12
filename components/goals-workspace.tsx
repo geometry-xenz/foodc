@@ -2,7 +2,8 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { AlertTriangle, Check, Flame, Loader2, Sparkles, Target, Zap } from "lucide-react";
+import { Check, Flame, Heart, Info, Loader2, Sparkles, Target, Zap, Droplets, ShieldCheck } from "lucide-react";
+import { computeBmi, calculateFullNutritionPlan, BiometricProfile } from "@/lib/biometrics";
 
 interface GoalWorkspaceProps {
   initialGoals: {
@@ -31,63 +32,93 @@ interface GoalWorkspaceProps {
   };
 }
 
-const GOALS = [
-  { id: "fat_loss", label: "Fat Loss", desc: "-20% caloric deficit, high protein (2.0 g/kg)", badge: "Cut" },
-  { id: "lean_bulk", label: "Lean Bulk", desc: "+10% caloric surplus, steady hypertrophy (1.8 g/kg)", badge: "Hypertrophy" },
-  { id: "bulk", label: "Aggressive Bulk", desc: "+18% caloric surplus, maximum muscle mass gain", badge: "Mass" },
-  { id: "dirty_bulk", label: "Dirty Bulk (Preference)", desc: "+25% surplus with unrestricted caloric density. Note: Higher adipose gain and lipid volatility.", badge: "Trade-off Note", warning: true },
-  { id: "maintenance", label: "Maintenance", desc: "100% TDEE equilibrium, balanced daily nutrition", badge: "Equilibrium" },
-  { id: "recomposition", label: "Recomposition", desc: "-5% deficit on rest days, +5% surplus on workout days", badge: "Body Recomp" },
-  { id: "athletic_performance", label: "Athletic Performance", desc: "High carbohydrate fueling (4-6 g/kg), rapid glycogen recovery", badge: "Endurance" },
-  { id: "general_health", label: "General Health", desc: "Cardiometabolic longevity, high micronutrient & dietary fibre density", badge: "Longevity" },
+const GOAL_OPTIONS: Array<{
+  id: BiometricProfile["primaryGoal"];
+  label: string;
+  tagline: string;
+  description: string;
+  badge: string;
+  accent: string;
+}> = [
+  {
+    id: "fat_loss",
+    label: "Fat Loss & Conditioning",
+    tagline: "Controlled deficit, lean mass preservation",
+    description: "-450 kcal deficit with elevated protein (2.2g/kg) to maximize fat oxidation while protecting metabolic rate.",
+    badge: "Fat Loss",
+    accent: "#E07A38",
+  },
+  {
+    id: "lean_bulk",
+    label: "Lean Muscle Hypertrophy",
+    tagline: "Measured surplus, clean muscle gain",
+    description: "+250 kcal controlled surplus to fuel progressive muscle protein synthesis with minimal adipose tissue accumulation.",
+    badge: "Hypertrophy",
+    accent: "#DFB271",
+  },
+  {
+    id: "bulk",
+    label: "Strength & Power Bulk",
+    tagline: "High capacity strength adaptation",
+    description: "+450 kcal surplus providing full glycogen replenishment and recovery for heavy progressive overload training.",
+    badge: "Strength",
+    accent: "#E59E6B",
+  },
+  {
+    id: "recomposition",
+    label: "Body Recomposition",
+    tagline: "Simultaneous fat loss & muscle toning",
+    description: "Near-isocaloric balance with high dietary protein (2.3g/kg) designed for simultaneous lean development and adipose reduction.",
+    badge: "Recomp",
+    accent: "#8FA989",
+  },
+  {
+    id: "athletic_performance",
+    label: "Athletic Endurance & Stamina",
+    tagline: "Glycogen-first functional fueling",
+    description: "Carbohydrate-optimized fueling strategy for prolonged aerobic endurance, high agility, and rapid recovery between bouts.",
+    badge: "Athletic",
+    accent: "#A8C4A2",
+  },
+  {
+    id: "maintenance",
+    label: "Metabolic Equilibrium & Longevity",
+    tagline: "Vitality, cardiometabolic balance",
+    description: "Equalized daily energy intake aligned with whole-food nutrient density and hormonal balance.",
+    badge: "Equilibrium",
+    accent: "#8F8578",
+  },
 ];
 
 export function GoalsWorkspace({ initialGoals, initialProfile, initialTargets }: GoalWorkspaceProps) {
   const router = useRouter();
-  const [primaryGoal, setPrimaryGoal] = useState(initialGoals.primary_goal || "lean_bulk");
-  const [gender, setGender] = useState(initialProfile.gender || "male");
-  const [weightKg, setWeightKg] = useState(initialProfile.weight_kg || 75.0);
-  const [heightCm, setHeightCm] = useState(initialProfile.height_cm || 178.0);
-  const [age, setAge] = useState(initialProfile.age || 28);
-  const [activity, setActivity] = useState(initialProfile.activity_level || "moderate");
+  const [primaryGoal, setPrimaryGoal] = useState<BiometricProfile["primaryGoal"]>(
+    (initialGoals.primary_goal as any) || "lean_bulk"
+  );
+  const [gender, setGender] = useState<"male" | "female" | "other">(
+    (initialProfile.gender as any) || "male"
+  );
+  const [weightKg, setWeightKg] = useState<number>(initialProfile.weight_kg || 72.0);
+  const [heightCm, setHeightCm] = useState<number>(initialProfile.height_cm || 176.0);
+  const [age, setAge] = useState<number>(initialProfile.age || 27);
+  const [activity, setActivity] = useState<BiometricProfile["activityLevel"]>(
+    (initialProfile.activity_level as any) || "moderate"
+  );
 
-  const [targets, setTargets] = useState(initialTargets);
   const [saving, setSaving] = useState(false);
   const [message, setMessage] = useState<{ type: "success" | "error"; text: string } | null>(null);
 
-  // Overrides
-  const [overrideCalories, setOverrideCalories] = useState<number | "">(initialTargets.target_calories_kcal || 2000);
-  const [overrideProtein, setOverrideProtein] = useState<number | "">(initialTargets.target_protein_g || 140);
+  // Compute live real-time biometrics using natural formula
+  const currentPlan = calculateFullNutritionPlan({
+    weightKg: Number(weightKg) || 70,
+    heightCm: Number(heightCm) || 170,
+    age: Number(age) || 25,
+    gender,
+    activityLevel: activity,
+    primaryGoal,
+  });
 
-  async function handleRecalculate() {
-    setSaving(true);
-    setMessage(null);
-    try {
-      const res = await fetch("/api/goals/calculate", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          gender,
-          weight_kg: Number(weightKg),
-          height_cm: Number(heightCm),
-          age: Number(age),
-          activity_level: activity,
-          goal: primaryGoal,
-        }),
-      });
-      if (res.ok) {
-        const data = await res.json();
-        setTargets(data);
-        setOverrideCalories(data.target_calories_kcal);
-        setOverrideProtein(data.target_protein_g);
-        setMessage({ type: "success", text: "Metabolic targets calculated via Mifflin-St Jeor engine." });
-      }
-    } catch {
-      setMessage({ type: "error", text: "Failed to recalculate targets." });
-    } finally {
-      setSaving(false);
-    }
-  }
+  const bmiAnalysis = computeBmi(Number(weightKg) || 70, Number(heightCm) || 170);
 
   async function handleSave() {
     setSaving(true);
@@ -99,11 +130,11 @@ export function GoalsWorkspace({ initialGoals, initialProfile, initialTargets }:
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           primary_goal: primaryGoal,
-          version: initialGoals.version,
+          target_weight_kg: Number(weightKg),
         }),
       });
 
-      // 2. Update profile biometrics
+      // 2. Update profile
       await fetch("/api/profile", {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
@@ -113,314 +144,393 @@ export function GoalsWorkspace({ initialGoals, initialProfile, initialTargets }:
           height_cm: Number(heightCm),
           age: Number(age),
           activity_level: activity,
-          version: initialProfile.version,
         }),
       });
 
-      // 3. Update target overrides
+      // 3. Update targets
       await fetch("/api/nutrition/targets", {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          target_calories_kcal: Number(overrideCalories),
-          target_protein_g: Number(overrideProtein),
-          version: initialTargets.version,
+          bmr_kcal: currentPlan.bmr,
+          tdee_kcal: currentPlan.tdee,
+          target_calories_kcal: currentPlan.targetCalories,
+          target_protein_g: currentPlan.macros.proteinG,
+          target_carbs_g: currentPlan.macros.carbsG,
+          target_fat_g: currentPlan.macros.fatG,
+          target_fiber_g: currentPlan.macros.fibreG,
         }),
       });
 
-      setMessage({ type: "success", text: "Goals, biometrics, and target overrides saved successfully!" });
+      setMessage({ type: "success", text: "Nutritional targets & biometrics synchronized seamlessly!" });
       router.refresh();
     } catch {
-      setMessage({ type: "error", text: "Failed to save goals." });
+      setMessage({ type: "error", text: "Unable to save changes right now. Please try again." });
     } finally {
       setSaving(false);
     }
   }
 
-  // Safety bounds check (§5.7)
-  const floorCalories = gender === "male" ? 1500 : 1200;
-  const isBelowFloor = Number(overrideCalories) < floorCalories;
-  const isHighSurplus = targets.tdee_kcal && Number(overrideCalories) > targets.tdee_kcal * 1.25;
-
   return (
-    <div className="space-y-8 w-full max-w-full overflow-x-hidden">
-      {/* 8 Goal Protocol Selection Cards */}
-      <div className="w-full">
-        <div className="mb-3 text-[0.62rem] uppercase tracking-wider text-[#E8B56A] font-semibold">
-          Select Your Active Protocol
-        </div>
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
-          {GOALS.map((g) => {
-            const isSelected = primaryGoal === g.id;
-            return (
-              <button
-                key={g.id}
-                type="button"
-                onClick={() => setPrimaryGoal(g.id)}
-                className={`flex flex-col text-left rounded-xl p-3.5 transition-all border ${
-                  isSelected
-                    ? "border-[#E8B56A] bg-[rgba(232,181,106,.12)] shadow-lg"
-                    : "border-white/5 bg-white/[0.02] hover:border-white/20"
-                }`}
-              >
-                <div className="flex items-center justify-between w-full">
-                  <span
-                    className={`rounded px-1.5 py-0.5 text-[0.55rem] uppercase tracking-wider font-semibold ${
-                      g.warning
-                        ? "bg-amber-500/20 text-amber-300"
-                        : isSelected
-                        ? "bg-[#E8B56A] text-[#080808]"
-                        : "bg-white/10 text-[#A79C8D]"
-                    }`}
-                  >
-                    {g.badge}
-                  </span>
-                  {isSelected && <Check size={14} className="text-[#E8B56A]" />}
-                </div>
-                <h3 className="mt-2 text-sm font-semibold text-[#F6EFE4]">{g.label}</h3>
-                <p className="mt-1 text-xs text-[#B3A798] leading-relaxed flex-1">{g.desc}</p>
-              </button>
-            );
-          })}
-        </div>
+    <div className="space-y-8 max-w-5xl">
+      {/* Header */}
+      <div>
+        <div className="eyebrow mb-2">Evidence-Based Physiology</div>
+        <h1 className="font-display text-3xl font-semibold text-[#F7F2EB] sm:text-4xl">
+          Biometrics, Energy &amp; <span className="text-gold-gradient">Nutritional Architecture</span>
+        </h1>
+        <p className="mt-2 text-sm text-[#A39788] max-w-2xl leading-relaxed">
+          Accurate metabolic modeling calculated from your height, bodyweight, age, and lifestyle activity. We balance your primary goal against macronutrient distribution and essential micronutrient targets.
+        </p>
       </div>
 
-      {/* Biometrics & Target Overrides Grid */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 w-full">
-        {/* Biometrics */}
-        <div className="rounded-2xl border border-white/10 bg-[#0e0c0a] p-4 sm:p-6 space-y-4 w-full">
-          <div className="flex items-center gap-2 text-sm font-semibold text-[#F6EFE4]">
-            <Target size={16} className="text-[#E8B56A]" />
-            Your Physical Biometrics
-          </div>
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
-            <div>
-              <label className="label" htmlFor="gender">Gender</label>
-              <select
-                id="gender"
-                value={gender}
-                onChange={(e) => setGender(e.target.value)}
-                className="field"
-              >
-                <option value="male">Male</option>
-                <option value="female">Female</option>
-              </select>
-            </div>
-            <div>
-              <label className="label" htmlFor="age">Age (years)</label>
-              <input
-                id="age"
-                type="number"
-                value={age}
-                onChange={(e) => setAge(Number(e.target.value))}
-                className="field"
-              />
-            </div>
-            <div>
-              <label className="label" htmlFor="weight">Weight (kg)</label>
-              <input
-                id="weight"
-                type="number"
-                step="0.5"
-                value={weightKg}
-                onChange={(e) => setWeightKg(Number(e.target.value))}
-                className="field"
-              />
-            </div>
-            <div>
-              <label className="label" htmlFor="height">Height (cm)</label>
-              <input
-                id="height"
-                type="number"
-                value={heightCm}
-                onChange={(e) => setHeightCm(Number(e.target.value))}
-                className="field"
-              />
-            </div>
-          </div>
-          <div>
-            <label className="label" htmlFor="activity">Activity Multiplier</label>
-            <select
-              id="activity"
-              value={activity}
-              onChange={(e) => setActivity(e.target.value)}
-              className="field"
-            >
-              <option value="sedentary">Sedentary (desk job, 1.2x)</option>
-              <option value="light">Light Activity (1-3 days/wk, 1.375x)</option>
-              <option value="moderate">Moderate Activity (3-5 days/wk, 1.55x)</option>
-              <option value="very_active">Very Active (6-7 days/wk, 1.725x)</option>
-            </select>
-          </div>
-          <button
-            type="button"
-            onClick={handleRecalculate}
-            disabled={saving}
-            className="btn btn-ghost w-full text-xs"
-          >
-            <Zap size={14} className="text-[#E8B56A]" /> Recalculate BMR & TDEE
-          </button>
+      {message && (
+        <div
+          className={`flex items-center gap-2 rounded-xl p-3.5 text-sm ${
+            message.type === "success"
+              ? "border border-[#8FA989]/40 bg-[#8FA989]/10 text-[#C1D6BD]"
+              : "border border-[#E07A38]/40 bg-[#E07A38]/10 text-[#F5B48B]"
+          }`}
+        >
+          {message.type === "success" ? <Check size={16} /> : <Info size={16} />}
+          <span>{message.text}</span>
         </div>
+      )}
 
-        {/* Calculated Targets & Overrides */}
-        <div className="rounded-2xl border border-white/10 bg-[#0e0c0a] p-4 sm:p-6 space-y-4 w-full">
-          <div className="flex items-center gap-2 text-sm font-semibold text-[#F6EFE4]">
-            <Target size={16} className="text-[#E8B56A]" />
-            Your Physical Biometrics
-          </div>
-          <div className="grid grid-cols-2 gap-4">
-            <div>
-              <label className="label" htmlFor="gender">Gender</label>
-              <select
-                id="gender"
-                value={gender}
-                onChange={(e) => setGender(e.target.value)}
-                className="field"
-              >
-                <option value="male">Male</option>
-                <option value="female">Female</option>
-              </select>
-            </div>
-            <div>
-              <label className="label" htmlFor="age">Age (years)</label>
-              <input
-                id="age"
-                type="number"
-                value={age}
-                onChange={(e) => setAge(Number(e.target.value))}
-                className="field"
-              />
-            </div>
-            <div>
-              <label className="label" htmlFor="weight">Weight (kg)</label>
-              <input
-                id="weight"
-                type="number"
-                step="0.5"
-                value={weightKg}
-                onChange={(e) => setWeightKg(Number(e.target.value))}
-                className="field"
-              />
-            </div>
-            <div>
-              <label className="label" htmlFor="height">Height (cm)</label>
-              <input
-                id="height"
-                type="number"
-                value={heightCm}
-                onChange={(e) => setHeightCm(Number(e.target.value))}
-                className="field"
-              />
-            </div>
-          </div>
-          <div>
-            <label className="label" htmlFor="activity">Activity Multiplier</label>
-            <select
-              id="activity"
-              value={activity}
-              onChange={(e) => setActivity(e.target.value)}
-              className="field"
-            >
-              <option value="sedentary">Sedentary (desk job, 1.2x)</option>
-              <option value="light">Light Activity (1-3 days/wk, 1.375x)</option>
-              <option value="moderate">Moderate Activity (3-5 days/wk, 1.55x)</option>
-              <option value="very_active">Very Active (6-7 days/wk, 1.725x)</option>
-            </select>
-          </div>
-          <button
-            type="button"
-            onClick={handleRecalculate}
-            disabled={saving}
-            className="btn btn-ghost w-full text-xs"
-          >
-            <Zap size={14} className="text-[#E8B56A]" /> Recalculate BMR & TDEE
-          </button>
-        </div>
-
-        {/* Calculated Targets & Overrides */}
-        <div className="rounded-2xl border border-white/10 bg-[#0e0c0a] p-6 space-y-4">
-          <div className="flex items-center gap-2 text-sm font-semibold text-[#F6EFE4]">
-            <Flame size={16} className="text-[#FF8A32]" />
-            Metabolic Target Overrides (§5.7)
-          </div>
-
-          <div className="grid grid-cols-2 gap-3 text-xs">
-            <div className="rounded-xl border border-white/5 bg-white/[0.02] p-3">
-              <span className="text-[#756D62] uppercase text-[0.55rem]">Calculated BMR</span>
-              <div className="font-display text-lg text-[#F6EFE4]">
-                {targets.bmr_kcal ? Math.round(targets.bmr_kcal) : "—"} kcal
-              </div>
-            </div>
-            <div className="rounded-xl border border-white/5 bg-white/[0.02] p-3">
-              <span className="text-[#756D62] uppercase text-[0.55rem]">Estimated TDEE</span>
-              <div className="font-display text-lg text-[#F6EFE4]">
-                {targets.tdee_kcal ? Math.round(targets.tdee_kcal) : "—"} kcal
-              </div>
-            </div>
-          </div>
-
-          <div className="space-y-3 pt-2">
-            <div>
-              <div className="flex justify-between items-center mb-1">
-                <label className="label !mb-0" htmlFor="ov-cal">Target Daily Calories (kcal)</label>
-                <span className="text-[0.6rem] text-[#756D62]">Floor: {floorCalories} kcal</span>
-              </div>
-              <input
-                id="ov-cal"
-                type="number"
-                value={overrideCalories}
-                onChange={(e) => setOverrideCalories(Number(e.target.value))}
-                className="field"
-              />
+      {/* Grid: Inputs + Realtime Biometrics Summary */}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 items-start">
+        {/* Left Column: Physical Inputs */}
+        <div className="lg:col-span-2 space-y-6">
+          <section className="app-card p-5 sm:p-6 space-y-5">
+            <div className="flex items-center gap-2 text-xs font-semibold uppercase tracking-wider text-[#DFB271]">
+              <Target size={15} />
+              1. Physical Biometrics &amp; Lifestyle
             </div>
 
-            <div>
-              <label className="label" htmlFor="ov-pro">Target Daily Protein (g)</label>
-              <input
-                id="ov-pro"
-                type="number"
-                value={overrideProtein}
-                onChange={(e) => setOverrideProtein(Number(e.target.value))}
-                className="field"
-              />
-            </div>
-          </div>
-
-          {/* Safety Bounds Warning */}
-          {(isBelowFloor || isHighSurplus) && (
-            <div className="rounded-xl border border-amber-500/30 bg-amber-500/10 p-3 text-xs text-amber-300 flex items-start gap-2">
-              <AlertTriangle size={15} className="shrink-0 mt-0.5" />
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div>
-                <strong>Safety Bounds Advisory (§5.7):</strong>{" "}
-                {isBelowFloor && `Target calories are below physiological minimum (${floorCalories} kcal). `}
-                {isHighSurplus && "Target surplus exceeds +25% of baseline TDEE."}
+                <label className="label">Biological Sex</label>
+                <div className="grid grid-cols-2 gap-2">
+                  {(["male", "female"] as const).map((g) => (
+                    <button
+                      key={g}
+                      type="button"
+                      onClick={() => setGender(g)}
+                      className={`h-10 rounded-xl text-xs font-semibold uppercase tracking-wider transition-all ${
+                        gender === g
+                          ? "bg-[#DFB271] text-[#14120F]"
+                          : "border border-white/10 bg-white/[0.02] text-[#A39788] hover:border-white/20"
+                      }`}
+                    >
+                      {g}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              <div>
+                <label className="label" htmlFor="age-input">Age (Years)</label>
+                <input
+                  id="age-input"
+                  type="number"
+                  min={14}
+                  max={100}
+                  value={age}
+                  onChange={(e) => setAge(Number(e.target.value))}
+                  className="field"
+                />
+              </div>
+
+              <div>
+                <label className="label" htmlFor="weight-input">Current Bodyweight (kg)</label>
+                <input
+                  id="weight-input"
+                  type="number"
+                  step="0.5"
+                  min={30}
+                  max={250}
+                  value={weightKg}
+                  onChange={(e) => setWeightKg(Number(e.target.value))}
+                  className="field"
+                />
+              </div>
+
+              <div>
+                <label className="label" htmlFor="height-input">Stature Height (cm)</label>
+                <input
+                  id="height-input"
+                  type="number"
+                  min={100}
+                  max={250}
+                  value={heightCm}
+                  onChange={(e) => setHeightCm(Number(e.target.value))}
+                  className="field"
+                />
               </div>
             </div>
-          )}
+
+            <div>
+              <label className="label">Activity &amp; Training Frequency</label>
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
+                {[
+                  { id: "sedentary", title: "Sedentary", desc: "Desk work, light walk" },
+                  { id: "moderate", title: "Moderate", desc: "3-4 workout sessions/wk" },
+                  { id: "very_active", title: "High Athletic", desc: "6+ intense sessions/wk" },
+                ].map((act) => (
+                  <button
+                    key={act.id}
+                    type="button"
+                    onClick={() => setActivity(act.id as any)}
+                    className={`rounded-xl border p-3 text-left transition-all ${
+                      activity === act.id
+                        ? "border-[#E07A38] bg-[#E07A38]/10 text-[#F7F2EB]"
+                        : "border-white/10 bg-white/[0.02] text-[#A39788] hover:border-white/20"
+                    }`}
+                  >
+                    <div className="text-xs font-semibold text-[#F7F2EB]">{act.title}</div>
+                    <div className="text-[11px] text-[#7A7063] mt-0.5">{act.desc}</div>
+                  </button>
+                ))}
+              </div>
+            </div>
+          </section>
+
+          {/* Goal Selector */}
+          <section className="app-card p-5 sm:p-6 space-y-4">
+            <div className="flex items-center gap-2 text-xs font-semibold uppercase tracking-wider text-[#DFB271]">
+              <Sparkles size={15} />
+              2. Primary Nutritional Objective
+            </div>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              {GOAL_OPTIONS.map((g) => {
+                const isSelected = primaryGoal === g.id;
+                return (
+                  <div
+                    key={g.id}
+                    onClick={() => setPrimaryGoal(g.id)}
+                    className={`cursor-pointer rounded-2xl border p-4 transition-all relative ${
+                      isSelected
+                        ? "border-[#E07A38] bg-[#E07A38]/10 shadow-[0_4px_20px_rgba(224,122,56,0.15)]"
+                        : "border-white/10 bg-white/[0.02] hover:border-white/20"
+                    }`}
+                  >
+                    <div className="flex items-center justify-between">
+                      <span className="text-xs font-bold text-[#F7F2EB]">{g.label}</span>
+                      <span
+                        className="rounded-full px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wider"
+                        style={{
+                          backgroundColor: `${g.accent}20`,
+                          color: g.accent,
+                          border: `1px solid ${g.accent}40`,
+                        }}
+                      >
+                        {g.badge}
+                      </span>
+                    </div>
+                    <div className="text-xs text-[#DFB271] mt-1 font-medium">{g.tagline}</div>
+                    <p className="text-[11px] text-[#8F8578] mt-1.5 leading-relaxed">
+                      {g.description}
+                    </p>
+                  </div>
+                );
+              })}
+            </div>
+          </section>
+        </div>
+
+        {/* Right Column: Live Physiological Feedback & BMI Card */}
+        <div className="space-y-6">
+          {/* BMI Card */}
+          <div className="app-card p-5 space-y-4">
+            <div className="flex items-center justify-between">
+              <span className="text-xs uppercase font-semibold tracking-wider text-[#A39788]">Body Mass Index</span>
+              <span
+                className="text-xs px-2.5 py-0.5 rounded-full font-semibold"
+                style={{
+                  backgroundColor: `${bmiAnalysis.color}20`,
+                  color: bmiAnalysis.color,
+                  border: `1px solid ${bmiAnalysis.color}40`,
+                }}
+              >
+                {bmiAnalysis.category}
+              </span>
+            </div>
+
+            <div className="flex items-baseline gap-2">
+              <span className="font-display text-4xl font-semibold text-[#F7F2EB]">{bmiAnalysis.bmi}</span>
+              <span className="text-xs text-[#7A7063]">kg / m²</span>
+            </div>
+
+            {/* Visual scale */}
+            <div className="space-y-1.5">
+              <div className="h-2 w-full rounded-full bg-white/10 overflow-hidden flex">
+                <div className="w-[18.5%] bg-[#DFB271]" title="Underweight (<18.5)" />
+                <div className="w-[25%] bg-[#8FA989]" title="Normal (18.5 - 24.9)" />
+                <div className="w-[20%] bg-[#E59E6B]" title="Overweight (25 - 29.9)" />
+                <div className="w-[36.5%] bg-[#E07A38]" title="Obesity (>30)" />
+              </div>
+              <div className="flex justify-between text-[10px] text-[#7A7063]">
+                <span>18.5</span>
+                <span>25.0</span>
+                <span>30.0</span>
+              </div>
+            </div>
+
+            <div className="rounded-xl border border-white/5 bg-white/[0.02] p-3 text-xs text-[#A39788]">
+              Healthy Weight Window for {heightCm} cm:
+              <div className="font-semibold text-[#F7F2EB] mt-0.5">
+                {bmiAnalysis.healthyWeightRangeKg.min} kg – {bmiAnalysis.healthyWeightRangeKg.max} kg
+              </div>
+            </div>
+          </div>
+
+          {/* Daily Energy & Macro Target Card */}
+          <div className="app-card p-5 space-y-4">
+            <div className="flex items-center justify-between">
+              <span className="text-xs uppercase font-semibold tracking-wider text-[#A39788]">Daily Calorie Budget</span>
+              <Flame size={15} className="text-[#E07A38]" />
+            </div>
+
+            <div className="flex items-baseline gap-2">
+              <span className="font-display text-4xl font-semibold text-[#E07A38]">
+                {currentPlan.targetCalories.toLocaleString()}
+              </span>
+              <span className="text-xs text-[#7A7063]">kcal / day</span>
+            </div>
+
+            <div className="grid grid-cols-2 gap-2 text-xs border-y border-white/10 py-3">
+              <div>
+                <span className="text-[11px] text-[#7A7063]">BMR (At Rest)</span>
+                <div className="font-semibold text-[#F7F2EB]">{currentPlan.bmr} kcal</div>
+              </div>
+              <div>
+                <span className="text-[11px] text-[#7A7063]">TDEE (Maintenance)</span>
+                <div className="font-semibold text-[#F7F2EB]">{currentPlan.tdee} kcal</div>
+              </div>
+            </div>
+
+            {/* Macro Distribution */}
+            <div className="space-y-3">
+              <div className="text-xs font-semibold uppercase tracking-wider text-[#DFB271]">
+                Macronutrient Target Split
+              </div>
+
+              <div>
+                <div className="flex justify-between text-xs mb-1">
+                  <span className="text-[#E07A38] font-medium">Protein (4 kcal/g)</span>
+                  <span className="font-semibold text-[#F7F2EB]">
+                    {currentPlan.macros.proteinG} g ({currentPlan.macros.percentages.protein}%)
+                  </span>
+                </div>
+                <div className="h-2 rounded-full bg-white/10 overflow-hidden">
+                  <div
+                    className="h-full bg-[#E07A38] rounded-full"
+                    style={{ width: `${currentPlan.macros.percentages.protein}%` }}
+                  />
+                </div>
+              </div>
+
+              <div>
+                <div className="flex justify-between text-xs mb-1">
+                  <span className="text-[#DFB271] font-medium">Carbohydrates (4 kcal/g)</span>
+                  <span className="font-semibold text-[#F7F2EB]">
+                    {currentPlan.macros.carbsG} g ({currentPlan.macros.percentages.carbs}%)
+                  </span>
+                </div>
+                <div className="h-2 rounded-full bg-white/10 overflow-hidden">
+                  <div
+                    className="h-full bg-[#DFB271] rounded-full"
+                    style={{ width: `${currentPlan.macros.percentages.carbs}%` }}
+                  />
+                </div>
+              </div>
+
+              <div>
+                <div className="flex justify-between text-xs mb-1">
+                  <span className="text-[#8FA989] font-medium">Dietary Fat (9 kcal/g)</span>
+                  <span className="font-semibold text-[#F7F2EB]">
+                    {currentPlan.macros.fatG} g ({currentPlan.macros.percentages.fat}%)
+                  </span>
+                </div>
+                <div className="h-2 rounded-full bg-white/10 overflow-hidden">
+                  <div
+                    className="h-full bg-[#8FA989] rounded-full"
+                    style={{ width: `${currentPlan.macros.percentages.fat}%` }}
+                  />
+                </div>
+              </div>
+
+              <div className="flex items-center justify-between text-xs border-t border-white/10 pt-2 text-[#A39788]">
+                <span>Dietary Fibre Goal:</span>
+                <span className="font-semibold text-[#F7F2EB]">{currentPlan.macros.fibreG} g / day</span>
+              </div>
+
+              <div className="flex items-center justify-between text-xs text-[#A39788]">
+                <span className="flex items-center gap-1">
+                  <Droplets size={13} className="text-[#8FA989]" /> Hydration Target:
+                </span>
+                <span className="font-semibold text-[#F7F2EB]">{currentPlan.waterIntakeLiters} L / day</span>
+              </div>
+            </div>
+          </div>
 
           <button
             type="button"
             onClick={handleSave}
             disabled={saving}
-            className="btn btn-gold w-full mt-4"
+            className="btn btn-gold w-full text-sm font-semibold"
           >
-            {saving ? <Loader2 size={15} className="animate-spin" /> : <Sparkles size={15} />}
-            Commit Goal & Target Configuration
+            {saving ? <Loader2 size={16} className="animate-spin" /> : <ShieldCheck size={16} />}
+            Synchronize Nutritional Architecture
           </button>
         </div>
       </div>
 
-      {message && (
-        <div
-          className={`rounded-xl border p-4 text-xs ${
-            message.type === "success"
-              ? "border-emerald-500/30 bg-emerald-500/10 text-emerald-300"
-              : "border-red-500/30 bg-red-500/10 text-red-300"
-          }`}
-        >
-          {message.text}
+      {/* Micronutrients Section: Real Nutrition Science */}
+      <section className="app-card p-6 space-y-4">
+        <div>
+          <div className="flex items-center gap-2 text-xs font-semibold uppercase tracking-wider text-[#8FA989]">
+            <Heart size={15} />
+            3. Essential Micronutrient Reference Values (DRVs)
+          </div>
+          <h2 className="font-display text-2xl font-semibold text-[#F7F2EB] mt-1">
+            Vitamins, Minerals &amp; Cellular Electrolytes
+          </h2>
+          <p className="text-xs text-[#A39788] mt-1">
+            Recommended dietary allowances calibrated for optimal hormonal balance, immune readiness, and cellular recovery.
+          </p>
         </div>
-      )}
+
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3.5">
+          {currentPlan.micros.map((m) => (
+            <div
+              key={m.name}
+              className="rounded-2xl border border-white/10 bg-white/[0.02] p-4 flex flex-col justify-between hover:border-white/20 transition-all"
+            >
+              <div>
+                <div className="flex items-center justify-between">
+                  <span className="text-xs font-bold text-[#F7F2EB]">{m.name}</span>
+                  <span className="rounded-full px-2 py-0.5 text-[9px] bg-white/5 font-mono text-[#DFB271]">
+                    {m.category}
+                  </span>
+                </div>
+                <div className="font-display text-2xl font-bold text-[#DFB271] mt-2">
+                  {m.target} <span className="text-xs font-sans font-normal text-[#8F8578]">{m.unit}</span>
+                </div>
+                <p className="text-[11px] text-[#A39788] mt-1 leading-normal">{m.benefits}</p>
+              </div>
+
+              <div className="mt-3 pt-2.5 border-t border-white/5">
+                <span className="text-[10px] uppercase font-semibold text-[#7A7063] tracking-wider">Top Sources</span>
+                <div className="text-[11px] text-[#C1D6BD] mt-0.5">
+                  {m.keySources.slice(0, 3).join(", ")}
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+      </section>
     </div>
   );
 }

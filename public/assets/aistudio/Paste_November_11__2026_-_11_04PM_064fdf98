@@ -1,0 +1,2313 @@
+# DRISHYAM — COMPLETE PRODUCT DEVELOPMENT MASTER SPECIFICATION
+## $100K Premium AI Computational Gastronomy, Intelligent Cooking & Personalized Nutrition Ecosystem
+
+You are a complete product engineering organization consisting of:
+
+- Principal software architect.
+- Senior Android engineer.
+- Senior full-stack engineer.
+- Computer vision and AI/ML engineer.
+- Computational gastronomy researcher.
+- Nutritional science engineer.
+- Product designer.
+- UI/UX interaction designer.
+- DevOps and infrastructure engineer.
+- Quality assurance engineer.
+
+Your responsibility is to design, engineer, implement, test and deliver **DRISHYAM**, a complete cross-platform AI-powered computational gastronomy and personalized nutrition ecosystem.
+
+This is a full-scale product development project, not a prototype, static landing page, generic recipe application or camera-scanning demo.
+
+The product must deliver exceptional visual design, genuine working functionality, robust architecture, accurate data handling, meaningful AI capabilities and seamless integration between the Android application and website.
+
+The expected quality benchmark is a premium $100,000 commissioned technology product.
+
+Do not compromise engineering quality for visual appearances. Do not compromise product usability for animations.
+
+---
+
+# 1. PRODUCT IDENTITY AND VISION
+
+**Product name:** DRISHYAM
+
+**Product category:** AI Computational Gastronomy and Personalized Nutrition Platform.
+
+**Primary tagline:**
+
+"See your ingredients. Discover your possibilities."
+
+**Secondary tagline:**
+
+"Your kitchen, understood. Your nutrition, decoded."
+
+**Product philosophy:**
+
+DRISHYAM connects five areas:
+
+1. Computer vision and ingredient recognition.
+2. Intelligent pantry and recipe discovery.
+3. Computational gastronomy and molecular flavour science.
+4. Nutritional intelligence and fitness personalization.
+5. Meal planning, tracking and food optimization.
+
+The platform should help users understand:
+
+- What ingredients they have.
+- What they can cook with those ingredients.
+- Why particular ingredients work together.
+- What aroma compounds create flavour compatibility.
+- Which ingredient substitutions are possible.
+- How many calories and nutrients a meal provides.
+- Whether a meal supports their fitness objective.
+- What one missing ingredient could unlock another recipe.
+- How their daily meals contribute to their nutritional goals.
+
+DRISHYAM should not feel like another recipe website with an AI chatbot attached.
+
+It should feel like an intelligent system that understands food.
+
+---
+
+# 2. MANDATORY EXISTING PROJECT AUDIT
+
+Before coding, inspect the existing repositories and assets.
+
+## 2.1 Foodoscope backend
+
+Read the complete existing project:
+
+`~/personal/foodoscope`
+
+This step is mandatory.
+
+Inspect actual source code, not only documentation.
+
+Understand:
+
+- Existing FastAPI architecture.
+- RecipeDB integrations.
+- FlavorDB integrations.
+- API request and response schemas.
+- External API clients.
+- Ingredient normalization.
+- Recipe search.
+- Ingredient-based recipe retrieval.
+- Dietary filters.
+- Recipe instructions.
+- Molecular flavour relationships.
+- Nutritional services, if available.
+- Existing databases.
+- Authentication, if implemented.
+- Cache mechanisms.
+- Rate limiting.
+- Error handling.
+- Environment variables.
+- Existing recommendation algorithms.
+- Existing demo datasets.
+
+Trace important API requests from their frontend or API entry points through their services and external providers.
+
+Determine which modules can be reused.
+
+Do not recreate working Foodoscope integrations unnecessarily.
+
+Do not overwrite or damage the existing Foodoscope project.
+
+## 2.2 Existing DRISHYAM website and assets
+
+Inspect the existing DRISHYAM repository.
+
+Locate:
+
+- Website source code.
+- Backend source code.
+- Existing Android project, if present.
+- `foodoscope.mp4`.
+- Four generated cinematic keyframes.
+- DRISHYAM full logo.
+- DRISHYAM standalone app icon.
+- Existing model weights.
+- Class mapping files.
+- Configuration files.
+- API documentation.
+
+Inspect the actual video, including its duration, frame rate, resolution and aspect ratio.
+
+Do not assume file locations. Locate assets before using them.
+
+Do not generate replacement assets when the provided assets are usable.
+
+## 2.3 Audit deliverable
+
+Produce an architecture assessment documenting:
+
+- Existing functionality.
+- Working integrations.
+- Reusable components.
+- Missing features.
+- Database compatibility.
+- Authentication compatibility.
+- API contract gaps.
+- Computer vision model availability.
+
+After the assessment, execute development. Do not stop at producing a report.
+
+---
+
+# 3. COMPLETE PRODUCT ARCHITECTURE
+
+DRISHYAM consists of three unified deliverables:
+
+1. Website.
+2. Native Android application.
+3. Centralized backend and data platform.
+
+```text
+                      DRISHYAM ECOSYSTEM
+
+                  ┌──────────────────────────┐
+                  │   CENTRAL BACKEND        │
+                  │                          │
+                  │ FastAPI                  │
+                  │ PostgreSQL               │
+                  │ Authentication           │
+                  │ User Profiles            │
+                  │ Pantry Management        │
+                  │ Nutrition Engine         │
+                  │ Fitness Goals            │
+                  │ Recipe Recommendation    │
+                  │ Foodoscope RecipeDB      │
+                  │ Foodoscope FlavorDB      │
+                  │ Meal Planning            │
+                  │ Synchronization          │
+                  └────────────┬─────────────┘
+                               │
+                    Shared REST API Contracts
+                               │
+                 ┌─────────────┴─────────────┐
+                 │                           │
+          DRISHYAM WEBSITE             DRISHYAM ANDROID
+                 │                           │
+          Next.js + TypeScript         Kotlin + Compose
+                 │                           │
+          Complete Web Product         Complete Mobile Product
+                 │                           │
+          Manual Pantry                Native AI Scanner
+          Recipes                      CameraX
+          Nutrition                    On-device YOLO
+          Flavour Science              Ingredient Detection
+          Fitness Goals                Pantry
+          Meal Planning                Recipes
+          Meal Tracking                Nutrition
+          Shopping                     Fitness Goals
+                                       Meal Planning
+                                       Meal Tracking
+                                       Shopping
+```
+
+## 3.1 Shared product rules
+
+Both clients must share:
+
+- User identity.
+- Authentication.
+- Profiles.
+- Fitness objectives.
+- Dietary preferences.
+- Allergies.
+- Nutrition targets.
+- Pantry.
+- Recipe history.
+- Saved recipes.
+- Meal plans.
+- Meal logs.
+- Shopping lists.
+- User settings.
+
+The Android app has an additional capability: native live ingredient scanning.
+
+The website does not have a live camera scanner.
+
+The website must support complete manual pantry management and must display and manage ingredients synchronized from Android.
+
+The Android app must contain every major website feature plus the scanner.
+
+Do not create separate databases, separate business logic or competing authentication systems.
+
+---
+
+# 4. PREMIUM PRODUCT DESIGN — $100K QUALITY STANDARD
+
+The finished product must feel like it was designed and developed by a leading consumer technology studio.
+
+A dark background, orange buttons and rounded cards are not sufficient.
+
+Every page, screen, interaction and visualization must receive individual design attention.
+
+## 4.1 Brand identity
+
+Use the existing DRISHYAM logo and icon.
+
+Brand direction:
+
+- Computational gastronomy.
+- Culinary science.
+- Premium food photography.
+- Intelligent nutritional analytics.
+- Modern luxury technology.
+
+## 4.2 Color system
+
+```css
+:root {
+  --background: #080808;
+  --surface: #111111;
+  --surface-elevated: #181818;
+
+  --primary: #FF8A32;
+  --secondary: #E8B56A;
+
+  --text-primary: #F5F0E9;
+  --text-secondary: #98928B;
+
+  --border: rgba(255,255,255,0.09);
+
+  --success: #83C98B;
+  --warning: #E5B65B;
+  --danger: #E47767;
+}
+```
+
+Android should maintain the equivalent design tokens through Compose.
+
+## 4.3 Design language
+
+Combine:
+
+- Apple-level interaction polish.
+- Premium food photography.
+- Luxury editorial layouts.
+- Scientific molecular visualizations.
+- Modern nutritional dashboards.
+- Sophisticated native animations.
+- Warm amber lighting.
+- High-quality typography.
+- Restrained glassmorphism.
+- Beautiful negative space.
+
+Avoid:
+
+- Generic SaaS templates.
+- Purple AI gradients.
+- Cartoon food graphics.
+- Excessive glow.
+- Excessive rounded cards.
+- Repetitive dashboard tiles.
+- Unnecessary animations.
+- Emoji-heavy UI.
+- Random decorative charts.
+
+Build a unified design system used by the website and Android application.
+
+---
+
+# 5. WEBSITE — COMPLETE FEATURE SPECIFICATION
+
+The website is a complete DRISHYAM product, not merely a marketing page.
+
+Implement the following routes and functionality.
+
+## 5.1 Public website
+
+Routes:
+
+```text
+/
+ /about
+ /how-it-works
+ /flavour-science
+ /nutrition
+ /features
+ /privacy
+ /terms
+ /contact
+ /login
+ /register
+ /forgot-password
+```
+
+### Homepage navigation
+
+Left:
+- DRISHYAM logo and wordmark.
+
+Center:
+- Discover.
+- How it works.
+- Flavour Science.
+- Nutrition.
+- About.
+
+Right:
+- Sign in.
+- Launch DRISHYAM.
+
+### Hero section
+
+Eyebrow:
+
+THE INTELLIGENT KITCHEN
+
+Headline:
+
+"Your ingredients. Your nutrition. Your next great meal."
+
+Description:
+
+"Discover what you can cook, understand the science of flavour and make every meal work towards your goals."
+
+Primary CTA:
+Start exploring.
+
+Secondary CTA:
+Discover how it works.
+
+### Cinematic video
+
+Use my existing `foodoscope.mp4`.
+
+Integrate it with:
+
+- HTML5 video.
+- Three.js.
+- GSAP ScrollTrigger.
+- Scroll-controlled video progress.
+- Responsive cropping.
+- Smooth video scrubbing.
+- Loading states.
+- Graceful failure handling.
+- Reduced-motion fallback.
+
+The video should respond to scroll progress instead of simply playing independently.
+
+Use the four generated cinematic keyframes as section references where appropriate:
+
+1. Ingredient universe.
+2. AI ingredient recognition.
+3. Molecular flavour science.
+4. Recipe and nutritional intelligence.
+
+The video and images are visual storytelling assets, not functional camera recognition.
+
+Initially use one video for desktop and mobile.
+
+### Website sections
+
+**Ingredient intelligence**
+
+Show the kinds of spices, vegetables, fruits, grains, legumes, dairy products and protein sources that DRISHYAM understands.
+
+**Intelligent pantry**
+
+Demonstrate how a user manages ingredients, quantities, categories and availability.
+
+**Recipe discovery**
+
+Show recipes ranked by available ingredients, cooking time, flavour compatibility and nutritional suitability.
+
+**Molecular flavour science**
+
+Visualize the relationships between ingredients and shared aroma compounds.
+
+**Nutritional intelligence**
+
+Demonstrate calorie, protein, carbohydrate, fat, fibre and micronutrient analysis.
+
+**Personalized cooking**
+
+Show how recipe suggestions differ for fat loss, lean bulk, maintenance and other nutritional objectives.
+
+**Final CTA**
+
+"Make more of what's already in your kitchen."
+
+## 5.2 Authenticated website application
+
+Routes:
+
+```text
+/app
+/app/pantry
+/app/recipes
+/app/recipes/[id]
+/app/flavour
+/app/nutrition
+/app/goals
+/app/meal-planner
+/app/meal-history
+/app/saved
+/app/shopping
+/app/profile
+/app/settings
+```
+
+Implement a complete responsive authenticated application.
+
+### Website dashboard
+
+Display:
+
+- Personalized welcome.
+- Fitness goal.
+- Calorie target.
+- Calories consumed.
+- Remaining calories.
+- Protein progress.
+- Macro progress.
+- Recent meals.
+- Pantry summary.
+- Personalized recipe recommendations.
+- Weekly nutrition trends.
+- Saved recipes.
+- Shopping suggestions.
+
+The dashboard must use real user data.
+
+Do not fabricate numerical data to make it appear populated.
+
+### Website pantry
+
+The website does not provide live camera scanning.
+
+Implement complete manual pantry management:
+
+- Add.
+- Search.
+- Edit.
+- Delete.
+- Quantity adjustment.
+- Unit adjustment.
+- Categories.
+- Expiry information where available.
+- Availability.
+- Import and display Android scanner records.
+
+The website must be able to modify records originally created by Android.
+
+### Website recipe discovery
+
+Use the shared recommendation engine.
+
+Provide:
+
+- Search.
+- Cuisine filters.
+- Dietary filters.
+- Maximum cooking time.
+- Nutrition filters.
+- Fitness goal compatibility.
+- Available ingredients.
+- Missing ingredients.
+- Recommended ingredient to add.
+
+### Website recipe detail
+
+Display:
+
+- Dish photograph.
+- Ingredients.
+- Quantities.
+- Serving adjustment.
+- Instructions.
+- Cooking time.
+- Difficulty.
+- Calories.
+- Macronutrients.
+- Micronutrients.
+- Flavour relationships.
+- Substitutions.
+- Goal compatibility.
+
+### Website flavour science
+
+Implement meaningful molecular visualizations using real FlavorDB data.
+
+Selecting ingredients should reveal relevant shared aroma compounds and compatibility details.
+
+### Website nutrition
+
+Provide a complete nutritional analytics dashboard.
+
+Support daily, weekly and monthly views.
+
+### Website meal planner
+
+Support daily and weekly planning with nutritional totals and shopping integration.
+
+### Website meal history
+
+Allow meal creation, editing, deletion and portion adjustments.
+
+### Website profile and settings
+
+Provide full account, fitness and dietary preference management.
+
+---
+
+# 6. ANDROID — COMPLETE NATIVE APPLICATION
+
+The Android application must contain all website functionality.
+
+It additionally includes the native ingredient scanner.
+
+It must not be implemented as a basic scanner companion.
+
+## 6.1 Android technology stack
+
+Use:
+
+- Kotlin.
+- Jetpack Compose.
+- Material 3 primitives with custom DRISHYAM styling.
+- Navigation Compose.
+- Clean Architecture.
+- MVVM.
+- Unidirectional Data Flow.
+- Hilt.
+- Room.
+- DataStore.
+- Retrofit.
+- OkHttp.
+- Kotlin Coroutines.
+- Flow.
+- WorkManager.
+- CameraX.
+- ONNX Runtime Mobile or TensorFlow Lite.
+- Android Keystore.
+
+Use stable compatible versions.
+
+## 6.2 Modular architecture
+
+Create a multi-module Android project.
+
+```text
+drishyam-android/
+
+app/
+
+core/
+  common/
+  model/
+  domain/
+  designsystem/
+  ui/
+  network/
+  database/
+  datastore/
+  security/
+  sync/
+  testing/
+
+feature/
+  auth/
+  onboarding/
+  dashboard/
+  scanner/
+  pantry/
+  recipes/
+  recipe-details/
+  flavour-science/
+  nutrition/
+  goals/
+  meal-planner/
+  meal-logs/
+  shopping/
+  saved-recipes/
+  profile/
+  settings/
+
+data/
+  auth/
+  users/
+  pantry/
+  recipes/
+  nutrition/
+  goals/
+  meals/
+  shopping/
+
+vision/
+  camera/
+  preprocessing/
+  inference/
+  postprocessing/
+  tracking/
+  accumulator/
+
+build-logic/
+```
+
+Adapt the structure where appropriate without mixing responsibilities.
+
+## 6.3 Android navigation
+
+Primary bottom navigation:
+
+1. Home.
+2. Scan.
+3. Pantry.
+4. Discover.
+5. Nutrition.
+
+Additional navigation:
+
+- My Goals.
+- Meal Planner.
+- Meal History.
+- Flavour Science.
+- Saved Recipes.
+- Shopping List.
+- Profile.
+- Settings.
+
+The scanner must remain easily accessible.
+
+## 6.4 Android screens
+
+Implement:
+
+- Splash.
+- Login.
+- Registration.
+- Password reset.
+- Onboarding.
+- Dashboard.
+- Live scanner.
+- Scanner results.
+- Pantry.
+- Pantry detail.
+- Recipe discovery.
+- Recipe detail.
+- Cooking mode.
+- Flavour science.
+- Nutrition dashboard.
+- Goal management.
+- Meal planner.
+- Meal logs.
+- Shopping list.
+- Saved recipes.
+- Profile.
+- Settings.
+
+Every screen must have real functionality.
+
+No dead-end placeholder screens.
+
+---
+
+# 7. COMPLETE FITNESS AND DIETARY GOAL SYSTEM
+
+This is a core feature across the entire DRISHYAM ecosystem.
+
+The user should not just choose vegetarian or non-vegetarian.
+
+They should be able to configure exactly what they want to achieve with their food.
+
+## 7.1 Fitness objectives
+
+Provide visually attractive goal-selection cards for the following.
+
+### Goal 1 — Fat Loss / Cutting
+
+Purpose: Reduce body fat while preserving lean mass.
+
+Recommendation priorities:
+
+- Appropriate calorie deficit.
+- High-protein meals.
+- Fibre-rich ingredients.
+- Nutrient density.
+- Appropriate portion sizes.
+- Balanced macros.
+- Satisfying meal options.
+
+Display goal-related explanations for every recommended recipe.
+
+### Goal 2 — Lean Bulk
+
+Purpose: Support muscle gain with controlled weight gain.
+
+Prioritize:
+
+- Modest energy surplus.
+- Adequate protein.
+- Balanced carbohydrates.
+- Appropriate dietary fat.
+- Nutrient-dense food.
+- Convenient meal preparation.
+
+### Goal 3 — Traditional Bulk
+
+Purpose: Increase body weight while supporting muscle development.
+
+Prioritize:
+
+- Energy surplus.
+- Protein availability.
+- Sufficient carbohydrates.
+- Energy-dense food options.
+- Practical meal frequency.
+
+### Goal 4 — Dirty Bulk Preference
+
+Allow users to select this as a high-calorie gaining preference.
+
+Explain the trade-offs, including potentially faster fat gain and lower diet quality.
+
+Do not portray dirty bulking as nutritionally superior.
+
+### Goal 5 — Maintenance
+
+Purpose: Maintain current weight.
+
+Prioritize:
+
+- Estimated energy balance.
+- Protein adequacy.
+- Balanced macros.
+- Dietary variety.
+- Nutrient density.
+
+### Goal 6 — Body Recomposition
+
+Purpose: Improve the balance of muscle and fat.
+
+Prioritize:
+
+- Adequate protein.
+- Appropriate energy intake.
+- Balanced nutrition.
+- Consistency.
+
+### Goal 7 — Athletic Performance
+
+Prioritize:
+
+- Adequate energy availability.
+- Carbohydrates.
+- Protein.
+- Meal timing.
+- Recovery-oriented nutritional choices.
+
+### Goal 8 — General Health
+
+Prioritize:
+
+- Nutritional diversity.
+- Fibre.
+- Micronutrients.
+- Balanced meals.
+- Appropriate energy intake.
+
+### User configuration
+
+Allow:
+- One primary goal.
+- Optional secondary goals.
+- User-defined calorie targets.
+- User-defined macro targets.
+- Goal changes at any time.
+- Target-weight updates.
+- Progress tracking.
+
+Dirty bulk must be a clearly identified preference rather than a medical or nutritional recommendation.
+
+## 7.2 Dietary lifestyle
+
+Offer:
+
+- Vegetarian.
+- Vegan.
+- Eggetarian.
+- Pescatarian.
+- Non-vegetarian.
+- No dietary restriction.
+
+Additional restrictions:
+
+- Dairy-free.
+- Lactose-free.
+- Gluten-free.
+- Jain-friendly.
+- Custom ingredient exclusions.
+
+## 7.3 Allergies and intolerances
+
+Support:
+
+- Peanuts.
+- Tree nuts.
+- Milk and dairy.
+- Eggs.
+- Soy.
+- Gluten and wheat.
+- Shellfish.
+- Custom allergens.
+
+Allergy restrictions must be hard filters, not ranking preferences.
+
+If ingredient composition is uncertain, display an explicit warning.
+
+## 7.4 Cuisine preferences
+
+Offer:
+
+- North Indian.
+- South Indian.
+- Punjabi.
+- Bengali.
+- Gujarati.
+- Rajasthani.
+- Chinese.
+- Japanese.
+- Korean.
+- Mediterranean.
+- Italian.
+- Mexican.
+- Other.
+
+## 7.5 Taste preferences
+
+Allow selecting:
+
+- Spicy.
+- Mild.
+- Tangy.
+- Sweet.
+- Savoury.
+- Rich.
+- Low-oil cooking.
+
+## 7.6 Meal preferences
+
+- Breakfast.
+- Lunch.
+- Dinner.
+- Snacks.
+- Pre-workout.
+- Post-workout.
+- Quick meals.
+- Batch cooking.
+- Meal preparation preferences.
+
+---
+
+# 8. PERSONALIZED NUTRITION ENGINE
+
+Implement a centralized, scientifically transparent calculation engine.
+
+Use documented formulas to estimate:
+
+- Basal Metabolic Rate.
+- Total Daily Energy Expenditure.
+- Maintenance calories.
+- Goal-specific calorie targets.
+- Protein targets.
+- Carbohydrate targets.
+- Fat targets.
+- Fibre targets.
+
+Consider:
+
+- Age.
+- Height.
+- Weight.
+- Activity level.
+- Goal.
+- User-selected preferences.
+- Relevant calculation assumptions.
+
+Users must be able to override calculated targets.
+
+Clearly distinguish estimates from measured values.
+
+Avoid extreme calorie targets and unsafe recommendations.
+
+## 8.1 Daily nutrition dashboard
+
+Display:
+
+- Calorie target.
+- Calories consumed.
+- Remaining calories.
+- Protein target and progress.
+- Carbohydrates.
+- Fat.
+- Fibre.
+- Meal contributions.
+- Daily and weekly trends.
+
+## 8.2 Recipe nutrition
+
+Every recipe must show:
+
+- Calories.
+- Calories per serving.
+- Protein.
+- Carbohydrates.
+- Fats.
+- Fibre.
+- Sugar.
+- Saturated fat.
+- Sodium.
+- Available vitamins and minerals.
+
+Support:
+
+- Serving-size adjustment.
+- Quantity adjustment.
+- Ingredient contribution.
+- Per-100g information where supported.
+
+Use a single backend calculation service.
+
+The website and Android app must show consistent nutritional values.
+
+## 8.3 Goal compatibility
+
+Show a contextual explanation.
+
+Examples:
+
+**Lean bulk:** "This meal contributes protein and carbohydrates towards your daily targets."
+
+**Fat loss:** "This recipe fits your selected calorie range and contains fibre-rich ingredients."
+
+**Maintenance:** "This meal contributes to your planned daily nutritional balance."
+
+Use actual data rather than generic promotional labels.
+
+A high-protein meal is not automatically suitable for every person or every goal.
+
+---
+
+# 9. ANDROID NATIVE AI INGREDIENT SCANNER
+
+This is the exclusive Android feature.
+
+Build a genuine real-time camera scanner.
+
+The website must not have an equivalent live camera scanner.
+
+## 9.1 Camera
+
+Use CameraX.
+
+Implement:
+
+- Live rear-camera preview.
+- Front/rear switching.
+- Torch control where supported.
+- Focus.
+- Exposure controls where appropriate.
+- Permission handling.
+- Freeze frame.
+- Manual capture.
+- Scanner stop and resume.
+
+Do not use a WebView for camera access.
+
+## 9.2 Computer vision model
+
+Use a lightweight culinary object detection model.
+
+Preferred:
+- YOLOv8n or compatible trained culinary YOLO model.
+- ONNX Runtime Mobile or TensorFlow Lite.
+
+Inspect the actual repository for existing:
+
+- `.onnx`
+- `.tflite`
+- `.pt`
+- Model class maps.
+- Metadata.
+- Training files.
+
+Do not pretend the model exists if it does not.
+
+Build a replaceable inference abstraction.
+
+Support GPU acceleration or NNAPI when compatible and CPU fallback.
+
+## 9.3 Target detection classes
+
+**Powders and granules**
+
+- Salt.
+- Turmeric powder.
+- Red chilli powder.
+- Coriander powder.
+- Black pepper powder.
+- Garam masala.
+
+**Whole spices**
+
+- Cumin.
+- Mustard seeds.
+- Cloves.
+- Cardamom.
+- Cinnamon.
+- Star anise.
+- Bay leaf.
+- Black peppercorns.
+- Coriander seeds.
+
+**Fresh produce**
+
+- Onion.
+- Tomato.
+- Garlic.
+- Ginger.
+- Green chilli.
+- Lemon.
+- Coriander leaves.
+- Potato.
+- Carrot.
+- Capsicum.
+
+**Staples and protein**
+
+- Rice.
+- Wheat flour.
+- Lentils.
+- Chickpeas.
+- Kidney beans.
+- Paneer.
+- Eggs.
+- Meat and seafood classes where trained.
+
+Only display actual model-supported classes as real detections.
+
+## 9.4 Detection pipeline
+
+```text
+CameraX
+   |
+ImageAnalysis
+   |
+Preprocessing
+   |
+Local Inference
+   |
+YOLO Detection
+   |
+Output Decoding
+   |
+Non-Maximum Suppression
+   |
+Bounding Box Mapping
+   |
+Temporal Tracking
+   |
+Confidence Filtering
+   |
+Ingredient Accumulator
+   |
+User Confirmation
+   |
+Room Pantry
+   |
+Backend Synchronization
+```
+
+## 9.5 Detection rules
+
+Require:
+
+- At least 75% confidence.
+- At least 1,000 milliseconds of stable detection.
+- Duplicate suppression.
+- Temporal smoothing.
+
+Use timestamps for persistence calculations rather than assuming a fixed frame rate.
+
+Provide accurate bounding-box mapping across device orientations and preview scaling modes.
+
+## 9.6 Scanner UI
+
+Top:
+- Back.
+- Scanner settings.
+- Torch.
+- Switch camera.
+
+Center:
+- Live camera.
+- Bounding boxes.
+- Ingredient names.
+- Confidence.
+- Scanning animation.
+
+Bottom:
+- Detection status.
+- Detected count.
+- Editable chips.
+- Manual add.
+- Freeze frame.
+- Confirm pantry.
+
+Example:
+
+Turmeric × | Cumin × | Chilli ×
+
+Show clearly whether a detection is:
+
+- In progress.
+- Stable.
+- Awaiting confirmation.
+- Confirmed.
+- Uncertain.
+
+Only confirmed ingredients should be saved permanently.
+
+## 9.7 Audio and haptic feedback
+
+Provide:
+
+- Recognition chime.
+- Haptic confirmation.
+- Independent sound toggle.
+- Independent haptic toggle.
+
+Avoid repeated feedback for duplicates.
+
+## 9.8 Deep Inspect
+
+Optional vision-model fallback.
+
+Workflow:
+
+1. User explicitly selects Deep Inspect.
+2. Capture one still frame.
+3. Show confirmation.
+4. Send the still image to the centralized DRISHYAM backend.
+5. Backend invokes configured vision provider.
+6. Return candidate ingredients.
+7. User verifies them.
+8. Save confirmed items.
+
+Never upload continuous video.
+
+Never expose external vision API keys in the APK.
+
+## 9.9 Performance
+
+Aim for approximately 25–30 FPS on capable devices where practical.
+
+Measure actual performance.
+
+Use adaptive processing.
+
+Monitor:
+- Inference latency.
+- Frame rate.
+- Memory.
+- Battery.
+- Thermal behavior.
+
+Do not process inference on the main thread.
+
+Pause inference when the scanner is closed.
+
+Release resources properly.
+
+---
+
+# 10. INTELLIGENT PANTRY
+
+Both website and Android must have full pantry functionality.
+
+Website uses manual management.
+
+Android provides manual management plus camera-based detection.
+
+Features:
+
+- Add ingredient.
+- Search.
+- Edit name.
+- Quantity.
+- Unit.
+- Category.
+- Remove.
+- Availability.
+- Optional expiry.
+- Low-stock status where quantities exist.
+- Source identification.
+- Scanner confidence.
+
+Categories:
+
+- Spices.
+- Vegetables.
+- Fruits.
+- Grains.
+- Legumes.
+- Dairy.
+- Meat and seafood.
+- Oils.
+- Condiments.
+- Other.
+
+Maintain canonical ingredient names and aliases.
+
+Prevent accidental duplicate ingredients.
+
+Example record:
+
+```json
+{
+  "id": "uuid",
+  "name": "turmeric",
+  "quantity": 100,
+  "unit": "g",
+  "source": "android_scanner",
+  "confidence": 0.97,
+  "confirmed": true
+}
+```
+
+---
+
+# 11. RECIPE DISCOVERY ENGINE
+
+Use Foodoscope RecipeDB through the centralized backend.
+
+Inputs must include:
+
+- Pantry ingredients.
+- Cooking time.
+- Dietary lifestyle.
+- Allergies.
+- Cuisine.
+- Taste.
+- Utensils.
+- Fitness goals.
+- Nutrition preferences.
+- Meal type.
+
+Example:
+
+```json
+{
+  "ingredients": [
+    "turmeric",
+    "cumin",
+    "onion",
+    "tomato"
+  ],
+  "minutes": 30,
+  "diet": "vegetarian",
+  "utensils": ["pan", "stove"],
+  "goal": "lean_bulk"
+}
+```
+
+## 11.1 Recipe card
+
+Display:
+
+- Dish photograph.
+- Recipe title.
+- Match score.
+- Cooking time.
+- Difficulty.
+- Dietary classification.
+- Ingredients available.
+- Missing ingredients.
+- Ingredient to add.
+- Calories.
+- Protein.
+- Goal compatibility.
+
+## 11.2 Recipe detail page
+
+Include:
+
+- Full ingredient list.
+- Quantities.
+- Serving selector.
+- Preparation time.
+- Cooking time.
+- Difficulty.
+- Instructions.
+- Nutritional breakdown.
+- Ingredient substitutions.
+- Molecular flavour compatibility.
+
+## 11.3 Cooking mode
+
+Create a dedicated practical cooking experience.
+
+Support:
+
+- Step-by-step instructions.
+- Current step.
+- Previous and next.
+- Ingredient quantities.
+- Cooking timers.
+- Screen-awake support where appropriate.
+- Progress tracking.
+- Finish cooking.
+- Meal logging.
+
+Design for someone actually cooking in a kitchen, possibly using the device with one hand.
+
+---
+
+# 12. FOODOSCOPE AND MOLECULAR FLAVOUR SCIENCE
+
+Integrate:
+
+**RecipeDB**
+- Recipe search.
+- Ingredient search.
+- Recipe details.
+- Instructions.
+- Dietary filtering where supported.
+
+**FlavorDB**
+- Ingredient aliases.
+- Aroma compounds.
+- Shared molecular structures.
+- Flavour relationships.
+- Substitution suggestions.
+
+Use the actual implementation and documentation from `~/personal/foodoscope`.
+
+Do not fabricate endpoint paths or response fields.
+
+## 12.1 Computational gastronomy ranking
+
+Use the original formula:
+
+```python
+score = (
+    0.30 * core_coverage +
+    0.20 * counter_utilisation +
+    0.20 * flavour_coherence +
+    0.30 * gap_fit
+)
+```
+
+All components must be normalized between 0 and 1.
+
+Apply hard restrictions before ranking:
+
+- Allergies.
+- Explicit ingredient exclusions.
+- Mandatory diet.
+- Other hard user constraints.
+
+Extend ranking with a separate configurable personalized nutrition layer based on:
+
+- Fitness goal compatibility.
+- Calorie suitability.
+- Protein suitability.
+- Macro balance.
+- Fibre.
+- Cooking time.
+- Cuisine preferences.
+
+Keep the original gastronomic score visible and explainable.
+
+Do not hide poor ingredient compatibility behind a high personalization score.
+
+## 12.2 Unlock Suggestion
+
+Identify the single missing ingredient that improves:
+
+- Recipe feasibility.
+- Flavour compatibility.
+- Nutritional suitability.
+
+Explain why this ingredient is recommended.
+
+Do not recommend unnecessary purchases.
+
+## 12.3 Flavour visualization
+
+Create an interactive molecular visualization using meaningful real data.
+
+Show:
+
+- Ingredient nodes.
+- Aroma compounds.
+- Shared compounds.
+- Relationships.
+- Compatibility explanations.
+- Substitutions.
+
+Selecting an item must show useful details.
+
+Do not generate random chemical structures and claim they represent actual compounds.
+
+---
+
+# 13. COMPLETE NUTRITIONAL INTELLIGENCE
+
+Create the centralized nutritional calculation system.
+
+Support:
+
+- Ingredient-level nutrient mapping.
+- Unit normalization.
+- Quantity conversion.
+- Recipe aggregation.
+- Portion calculations.
+- Per-serving values.
+- Per-100g values where available.
+- Macro calculations.
+- Micronutrients.
+- Meal logging.
+- Daily totals.
+- Historical trends.
+
+Use reliable nutritional datasets or configured providers.
+
+Clearly identify values that are calculated, estimated or database-sourced.
+
+Never invent exact nutrition values.
+
+Keep nutritional calculations identical across website and Android.
+
+---
+
+# 14. MEAL PLANNING AND TRACKING
+
+Implement complete daily and weekly meal planning.
+
+Meal types:
+
+- Breakfast.
+- Lunch.
+- Dinner.
+- Snacks.
+- Pre-workout.
+- Post-workout.
+
+Features:
+
+- Add recipes.
+- Set portions.
+- Move meals.
+- Reorder.
+- Track nutritional totals.
+- Compare against daily targets.
+- Generate shopping lists.
+- Save meal plans.
+- Review previous plans.
+
+Meal logging:
+
+- Recipe consumed.
+- Portion.
+- Date and time.
+- Calories.
+- Macronutrients.
+- Notes.
+- Edit and delete.
+
+Provide daily, weekly and monthly nutrition summaries.
+
+---
+
+# 15. SHOPPING LIST AND PANTRY OPTIMIZATION
+
+Generate shopping suggestions from:
+
+- Missing recipe ingredients.
+- Planned meals.
+- Low-stock pantry items.
+- User-created lists.
+- Nutritional preferences.
+
+Support:
+
+- Add item.
+- Edit.
+- Quantity.
+- Unit.
+- Mark purchased.
+- Delete.
+- Suggest substitutions.
+- Build lists from meal plans.
+
+Avoid unnecessary shopping suggestions.
+
+Prioritize using existing pantry ingredients.
+
+---
+
+# 16. WEBSITE AND ANDROID PARITY
+
+The website and Android application must support all core DRISHYAM capabilities.
+
+| Capability | Website | Android |
+|---|---|---|
+| User authentication | Yes | Yes |
+| Profile | Yes | Yes |
+| Fitness goals | Yes | Yes |
+| Dietary preferences | Yes | Yes |
+| Allergies | Yes | Yes |
+| Pantry management | Yes | Yes |
+| Live camera scanner | No | Yes |
+| On-device inference | No | Yes |
+| Recipe discovery | Yes | Yes |
+| Recipe details | Yes | Yes |
+| Cooking mode | Yes | Yes |
+| RecipeDB | Yes | Yes |
+| FlavorDB | Yes | Yes |
+| Molecular visualization | Yes | Yes |
+| Nutrition dashboard | Yes | Yes |
+| Macro targets | Yes | Yes |
+| Meal planning | Yes | Yes |
+| Meal tracking | Yes | Yes |
+| Saved recipes | Yes | Yes |
+| Shopping list | Yes | Yes |
+| Historical analytics | Yes | Yes |
+| Cross-platform sync | Yes | Yes |
+
+No major functionality should be exclusive to the website except that live camera scanning is exclusive to Android.
+
+---
+
+# 17. CENTRALIZED BACKEND
+
+Use one FastAPI backend.
+
+It must serve both clients.
+
+Suggested architecture:
+
+```text
+backend/
+  app/
+    main.py
+    config.py
+
+    api/
+      auth.py
+      profiles.py
+      preferences.py
+      goals.py
+      pantry.py
+      scan.py
+      recipes.py
+      recommend.py
+      flavour.py
+      nutrition.py
+      meal_plans.py
+      meal_logs.py
+      shopping.py
+      sync.py
+
+    core/
+      security.py
+      dependencies.py
+      exceptions.py
+
+    models/
+      user.py
+      profile.py
+      preference.py
+      goal.py
+      pantry.py
+      recipe.py
+      nutrition.py
+      meal.py
+      shopping.py
+
+    schemas/
+      auth.py
+      users.py
+      pantry.py
+      recipes.py
+      nutrition.py
+      recommendations.py
+
+    services/
+      recipedb.py
+      flavordb.py
+      vision.py
+      gastronomy.py
+      recommendation.py
+      nutrition_calculator.py
+      goal_calculator.py
+      pantry.py
+      meal_planner.py
+      shopping.py
+      cache.py
+      synchronization.py
+
+    repositories/
+
+  migrations/
+  tests/
+  data/
+```
+
+Use PostgreSQL for production.
+
+SQLite may be used for local demonstration if needed.
+
+Implement:
+- SQLAlchemy.
+- Alembic.
+- Pydantic.
+- Authentication.
+- Authorization.
+- User data isolation.
+- Input validation.
+- Caching.
+- Timeouts.
+- Retry logic.
+- Rate limiting.
+- Request tracing.
+- Structured logging.
+
+## 17.1 Core API endpoints
+
+### Authentication
+
+```text
+POST /api/auth/register
+POST /api/auth/login
+POST /api/auth/logout
+POST /api/auth/refresh
+GET  /api/auth/me
+```
+
+### User profile
+
+```text
+GET /api/profile
+PUT /api/profile
+GET /api/preferences
+PUT /api/preferences
+```
+
+### Goals
+
+```text
+GET  /api/goals
+PUT  /api/goals
+POST /api/goals/calculate
+GET  /api/nutrition/targets
+PUT  /api/nutrition/targets
+```
+
+### Pantry
+
+```text
+GET    /api/pantry
+POST   /api/pantry
+PUT    /api/pantry/{id}
+DELETE /api/pantry/{id}
+```
+
+### Scanning
+
+```text
+POST /api/scan/deep-inspect
+```
+
+This endpoint accepts an explicitly captured still image only.
+
+Continuous scanning remains local.
+
+### Recipes
+
+```text
+POST /api/recommend
+GET  /api/recipes/{id}
+GET  /api/instructions/{id}
+POST /api/recipes/{id}/save
+DELETE /api/recipes/{id}/save
+```
+
+### Flavor science
+
+```text
+GET /api/flavour/{ingredient}
+GET /api/substitute?ingredient=<name>
+```
+
+### Nutrition
+
+```text
+POST /api/nutrition/analyze
+GET  /api/nutrition/summary
+POST /api/nutrition/meal-log
+GET  /api/nutrition/history
+```
+
+### Meal planning
+
+```text
+GET    /api/meal-plans
+POST   /api/meal-plans
+PUT    /api/meal-plans/{id}
+DELETE /api/meal-plans/{id}
+```
+
+### Shopping
+
+```text
+GET  /api/shopping/suggestions
+POST /api/shopping/items
+```
+
+### Synchronization
+
+```text
+GET /api/sync/bootstrap
+GET /api/sync/changes?since=<cursor>
+POST /api/sync/push
+GET /api/sync/status
+```
+
+### Health
+
+```text
+GET /api/health
+GET /api/health/integrations
+```
+
+Use the actual existing backend contract where one already exists.
+
+Do not blindly create duplicate endpoints.
+
+---
+
+# 18. CROSS-PLATFORM AUTHENTICATION AND DATA SYNCHRONIZATION
+
+One user identity must work on both platforms.
+
+A person who registers through the website can log in on Android using the same credentials.
+
+A person who registers on Android can log in on the website.
+
+Each platform establishes its own secure session.
+
+Use secure browser cookies and Android Keystore-backed token storage as appropriate.
+
+The backend is the authority for shared account data.
+
+## 18.1 Synchronization requirements
+
+Synchronize:
+
+- User profile.
+- Dietary preferences.
+- Allergies.
+- Fitness goals.
+- Nutrition targets.
+- Pantry ingredients.
+- Recipe history.
+- Saved recipes.
+- Meal plans.
+- Meal logs.
+- Nutrition summaries.
+- Shopping lists.
+- Settings.
+
+Example:
+
+1. User scans turmeric on Android.
+2. Local model recognizes it.
+3. User confirms the item.
+4. Android stores it locally.
+5. Synchronization sends it to the backend.
+6. Backend stores the pantry record.
+7. Website displays turmeric.
+8. Website allows editing or deleting it.
+
+Reverse synchronization must also work.
+
+## 18.2 Offline-first strategy
+
+Android:
+
+- Room database.
+- Local scanner.
+- Offline pantry changes.
+- Local meal logs.
+- Operation outbox.
+- WorkManager synchronization.
+- Retry logic.
+
+Website:
+
+- Persistent backend data.
+- Appropriate read caching.
+- Clear network error states.
+- Preservation of unsaved changes.
+
+Use stable UUIDs, version tracking, timestamps, incremental synchronization and idempotency keys.
+
+Do not blindly overwrite newer information.
+
+Test concurrent changes.
+
+---
+
+# 19. REQUIRED DATABASE ENTITIES
+
+Design a normalized relational data model.
+
+At minimum:
+
+**Identity**
+- User.
+- UserProfile.
+- AuthSession.
+
+**Personalization**
+- FitnessGoal.
+- DietaryPreference.
+- Allergy.
+- IngredientExclusion.
+- CuisinePreference.
+- TastePreference.
+- NutritionTarget.
+
+**Pantry**
+- Ingredient.
+- IngredientAlias.
+- PantryItem.
+- PantryCategory.
+- PantryChangeHistory.
+
+**Recipes**
+- Recipe.
+- RecipeIngredient.
+- RecipeInstruction.
+- SavedRecipe.
+- RecipeRecommendation.
+
+**Nutrition**
+- Nutrient.
+- IngredientNutrition.
+- RecipeNutrition.
+- MealLog.
+- MealLogItem.
+- DailyNutritionSummary.
+
+**Planning**
+- MealPlan.
+- PlannedMeal.
+- ShoppingList.
+- ShoppingItem.
+
+**Flavour science**
+- FlavourCompound.
+- IngredientCompound.
+- IngredientRelationship.
+
+Use foreign keys, indexes, ownership constraints and migrations.
+
+Avoid duplicating external RecipeDB and FlavorDB records without a clear caching or provenance strategy.
+
+---
+
+# 20. OFFLINE DEMONSTRATION AND DATA PROVENANCE
+
+Create a useful demo dataset with:
+
+- At least 20 diverse recipes.
+- Common Indian spices.
+- Vegetables.
+- Fruits.
+- Grains.
+- Legumes.
+- Dairy.
+- Protein sources.
+- Ingredient quantities.
+- Cooking instructions.
+- Nutrition fixtures.
+- Flavour relationship fixtures.
+
+Demo data must be visibly identified.
+
+Never claim:
+- Mock model detection is genuine AI.
+- Demo recipes are live RecipeDB results.
+- Simulated compounds are actual FlavorDB results.
+- Estimated nutrient values are laboratory measurements.
+
+Every important data source should have appropriate provenance.
+
+---
+
+# 21. SECURITY, PRIVACY AND USER TRUST
+
+Implement:
+
+- Secure password hashing.
+- Session management.
+- Refresh token protection.
+- HTTPS.
+- Proper authorization.
+- Rate limiting.
+- Input validation.
+- User data isolation.
+- Secure secret storage.
+- No API key exposure.
+- No sensitive information in logs.
+- Camera privacy disclosure.
+- Explicit Deep Inspect upload consent.
+- Account data deletion where supported.
+
+Continuous scanning must remain on-device.
+
+Do not transmit video streams to the backend.
+
+Allow users to review detections before permanent pantry insertion.
+
+---
+
+# 22. ENGINEERING QUALITY AND PERFORMANCE
+
+### Android
+
+Prioritize:
+
+- Efficient Compose recomposition.
+- Memory-safe image loading.
+- Camera resource cleanup.
+- Inference performance.
+- Battery efficiency.
+- Thermal management.
+- Background synchronization.
+- Database performance.
+- Accessibility.
+
+### Website
+
+Prioritize:
+
+- Responsive layouts.
+- Video optimization.
+- Lazy loading.
+- Efficient Three.js rendering.
+- Scroll synchronization.
+- Accessible forms.
+- Fast authenticated application navigation.
+- Server-side API security.
+
+### Backend
+
+Prioritize:
+
+- Async external API calls.
+- Query efficiency.
+- Caching.
+- Structured logging.
+- Reliable migrations.
+- Error recovery.
+- API consistency.
+- Data integrity.
+
+---
+
+# 23. AUTOMATED TESTING
+
+Test both platforms and the backend.
+
+## Authentication
+- Register on website and log in on Android.
+- Register on Android and log in on website.
+- Refresh session.
+- Logout.
+- Session expiration.
+
+## Personalization
+- Fat loss.
+- Lean bulk.
+- Traditional bulk.
+- Dirty bulk preference.
+- Maintenance.
+- Body recomposition.
+- Vegetarian.
+- Vegan.
+- Non-vegetarian.
+- Allergies.
+
+## Scanner
+- Camera permission.
+- Camera initialization.
+- Model loading.
+- Actual inference when weights are available.
+- Bounding box mapping.
+- Confidence threshold.
+- One-second persistence.
+- Duplicate suppression.
+- Manual correction.
+- Offline recognition.
+
+## Pantry
+- Manual addition.
+- Scanner addition.
+- Editing.
+- Deletion.
+- Duplicate prevention.
+- Cross-platform synchronization.
+
+## Recipe discovery
+- Ingredient filtering.
+- Foodoscope integration.
+- Dietary filtering.
+- Allergy hard filters.
+- Goal personalization.
+- Unlock Suggestions.
+
+## Nutrition
+- Recipe calculation.
+- Portion adjustment.
+- Macro consistency.
+- Daily totals.
+- Meal logging.
+- Historical analysis.
+
+## Synchronization
+- Website to Android.
+- Android to website.
+- Offline changes.
+- Retry handling.
+- Duplicate prevention.
+- Concurrent edits.
+- Account isolation.
+
+Do not report passing tests without actually executing them.
+
+---
+
+# 24. PREMIUM PRODUCT QUALITY ACCEPTANCE
+
+The $100K quality benchmark must apply to actual product experience, not only screenshots.
+
+### Design
+
+- Consistent design system.
+- Custom visual identity.
+- Excellent typography.
+- Strong information hierarchy.
+- Premium food imagery.
+- Clear data visualizations.
+- Smooth interactions.
+- Responsive website.
+- Consistent native Android UI.
+
+### Product functionality
+
+- No dead buttons.
+- No fake integrations.
+- No static mockups presented as finished features.
+- No hardcoded nutritional dashboards.
+- No placeholder business logic.
+- No silent scanner failures.
+
+### Engineering
+
+- Proper modular architecture.
+- Reusable components.
+- Typed API contracts.
+- Offline support.
+- Secure authentication.
+- Persistent data.
+- Cross-platform synchronization.
+- Automated testing.
+- Documentation.
+
+---
+
+# 25. DELIVERY REQUIREMENTS
+
+## Website deliverable
+
+- Complete Next.js application.
+- Complete responsive homepage.
+- Cinematic Three.js experience.
+- Authentication.
+- Dashboard.
+- Pantry.
+- Recipes.
+- Recipe details.
+- Flavour science.
+- Nutrition.
+- Goals.
+- Meal planning.
+- Meal history.
+- Shopping.
+- Profile.
+- Settings.
+
+## Android deliverable
+
+- Complete Android Studio project.
+- Kotlin source code.
+- Jetpack Compose application.
+- Modular Clean Architecture.
+- CameraX scanner.
+- ONNX/TFLite integration.
+- Room persistence.
+- WorkManager synchronization.
+- Authentication.
+- All website features.
+- Tests.
+- Debug APK.
+- Release build configuration.
+
+## Backend deliverable
+
+- Complete FastAPI implementation.
+- PostgreSQL schema.
+- Database migrations.
+- Authentication.
+- Recipe recommendation engine.
+- Nutrition engine.
+- Fitness personalization.
+- Foodoscope integrations.
+- FlavorDB services.
+- Pantry services.
+- Meal tracking.
+- Shopping.
+- Synchronization.
+- API documentation.
+- Tests.
+
+## Documentation
+
+Produce:
+
+- README.
+- Architecture documentation.
+- API specification.
+- Database documentation.
+- `.env.example`.
+- Local development guide.
+- Android build guide.
+- Deployment guide.
+- Integration setup.
+- Demo mode guide.
+- Known limitations.
+
+At completion, report:
+
+- Implemented features.
+- Working integrations.
+- Demo functionality.
+- Missing credentials.
+- Missing model weights.
+- Tests performed.
+- Performance measurements.
+- Known limitations.
+- Build and deployment status.
+
+---
+
+# 26. EXECUTION PLAN
+
+Implement the project in a controlled sequence.
+
+**Phase 1 — Discovery**
+
+Inspect `~/personal/foodoscope`, DRISHYAM repositories and existing assets.
+
+**Phase 2 — Architecture**
+
+Define API contracts, database, authentication, shared domain models and synchronization.
+
+**Phase 3 — Backend**
+
+Implement persistent data, authentication, RecipeDB, FlavorDB, nutrition and recommendation services.
+
+**Phase 4 — Website**
+
+Build the cinematic public experience and complete authenticated application.
+
+**Phase 5 — Android architecture**
+
+Build the modular Kotlin project, data layer, domain layer, Compose design system and authentication.
+
+**Phase 6 — Computer vision**
+
+Implement CameraX, model integration, preprocessing, tracking, detection accumulator and confirmation.
+
+**Phase 7 — Personalization**
+
+Implement goals, nutrition targets and fitness-oriented recipe recommendations.
+
+**Phase 8 — Complete functionality**
+
+Implement pantry, recipes, flavour science, nutrition, meal planning, meal history and shopping on both platforms.
+
+**Phase 9 — Synchronization**
+
+Verify that all shared user data works across Android and website.
+
+**Phase 10 — Testing and optimization**
+
+Test end-to-end workflows, real device behavior, performance, security, offline operation and responsive layouts.
+
+**Phase 11 — Delivery**
+
+Document, build and verify the website, backend and APK.
+
+Do not stop after planning.
+
+Do not stop after generating UI screens.
+
+Do not replace functioning backend integrations with hardcoded fixtures while claiming they are live.
+
+Do not implement a fake scanner.
+
+Do not implement the camera scanner on the website.
+
+Do not duplicate authentication or data logic.
+
+Make sensible implementation decisions and complete the product.
+
+---
+
+# FINAL PRODUCT ACCEPTANCE CRITERION
+
+DRISHYAM is complete when a user can:
+
+1. Register on the website or Android app.
+2. Log in on either platform using the same account.
+3. Set their profile and nutritional objectives.
+4. Choose fat loss, cutting, lean bulk, traditional bulk, dirty bulk preference, maintenance, recomposition, athletic performance or general health.
+5. Set dietary preferences and allergies.
+6. Configure calorie and macro targets.
+7. Scan real kitchen ingredients using Android's on-device AI.
+8. Manage the pantry on either platform.
+9. Discover recipes through Foodoscope RecipeDB.
+10. Explore molecular relationships through FlavorDB.
+11. Understand ingredient substitutions.
+12. View accurate, traceable nutritional analysis.
+13. Understand how each recipe supports their chosen goals.
+14. Plan daily and weekly meals.
+15. Log meals and track nutritional progress.
+16. Generate shopping lists.
+17. Continue scanning offline.
+18. Synchronize all shared data between the website and Android.
+
+**DRISHYAM must be delivered as one unified, premium-quality computational gastronomy ecosystem, not three disconnected software projects.**
+
+The ultimate product proposition:
+
+**Know what you have. Understand what works together. Discover what you can cook. Know what you eat. Eat for what you want to achieve.**

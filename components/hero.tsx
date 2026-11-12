@@ -137,10 +137,10 @@ export function Hero({
             Your next great meal.
           </h1>
 
-          <p className="mt-7 max-w-[560px] text-[0.95rem] leading-7 text-[#B3A798] sm:text-[1.02rem]">
-            DRISHYAM reads the molecular language of your kitchen — profiling
-            volatile aromatics, ranking what you can cook right now, and
-            translating every plate into precise metabolic targets.
+          <p className="mt-7 max-w-[580px] text-[0.95rem] leading-7 text-[#B3A798] sm:text-[1.02rem]">
+            Discover what you can cook, understand the science of flavour and
+            make every meal work towards your goals — reading volatile aromatics
+            and ranking what you can cook right now.
           </p>
 
           <div className="mt-9 flex flex-wrap items-center gap-3.5">

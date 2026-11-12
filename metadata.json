@@ -1,0 +1,8 @@
+{
+  "name": "DRISHYAM",
+  "description": "AI-powered computational gastronomy & personalized nutrition platform",
+  "permissions": [],
+  "capabilities": [
+    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
+  ]
+}

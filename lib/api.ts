@@ -17,7 +17,7 @@ export class ApiError extends Error {
 const API_ORIGIN =
   process.env.API_ORIGIN ||
   process.env.NEXT_PUBLIC_API_ORIGIN ||
-  "http://127.0.0.1:8000";
+  (process.env.PORT ? `http://127.0.0.1:${process.env.PORT}` : "http://127.0.0.1:3000");
 
 interface FetchOptions extends RequestInit {
   redirectOn401?: boolean;

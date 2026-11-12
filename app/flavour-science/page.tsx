@@ -34,7 +34,7 @@ export default function FlavourSciencePage() {
           </h3>
           <p className="mt-2 text-xs leading-relaxed text-[#8B7E6D]">
             Ingredients are deterministically arrayed across a Fibonacci golden-spiral sphere.
-            Identical inputs yield exact floating-point coordinates across web and Android.
+            Identical inputs yield exact floating-point coordinates across all rendering viewports.
           </p>
         </div>
 

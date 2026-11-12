@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
-import { Menu, X, Sparkles } from "lucide-react";
+import { Menu, Sparkles, X } from "lucide-react";
 import { Logo } from "@/components/logo";
 
 const LINKS = [
@@ -49,10 +49,10 @@ export function LandingNav() {
             ))}
           </div>
 
-          <div className="hidden items-center gap-2.5 sm:flex">
+          <div className="hidden items-center gap-3 sm:flex">
             <Link
               href="/login"
-              className="px-3 text-[0.72rem] font-medium uppercase tracking-[0.12em] text-[#A79C8D] transition-colors hover:text-[#F6EFE4]"
+              className="px-2.5 text-[0.72rem] font-medium uppercase tracking-[0.12em] text-[#A79C8D] transition-colors hover:text-[#F6EFE4]"
             >
               Sign in
             </Link>
