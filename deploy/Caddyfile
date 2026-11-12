@@ -2,7 +2,7 @@
     email {$ACME_EMAIL:admin@drishyam.kitchen}
 }
 
-{$CADDY_HOST:localhost} {
+{$CADDY_HOST::80} {
     encode gzip zstd
 
     # Route backend REST and OpenAPI documentation
