@@ -80,42 +80,39 @@ async def register(
 
     db.add_all([profile, goal, diet, nut, settings])
 
-    # Issue session according to client
-    if req.client == "android":
-        raw_acc, acc_h, raw_ref, ref_h, acc_exp, ref_exp = create_android_token_pair()
-        session = AuthSession(
-            user_id=user.id,
-            client="android",
-            access_hash=acc_h,
-            refresh_hash=ref_h,
-            access_expires_at=acc_exp,
-            refresh_expires_at=ref_exp,
-        )
-        db.add(session)
-        await db.commit()
-        return AuthResponse(
-            user=UserResponse(id=user.id, email=user.email, name=user.name),
-            client="android",
-            access_token=raw_acc,
-            refresh_token=raw_ref,
-            expires_in=900,
-        )
-    else:  # web
-        raw_tok, tok_h, exp = create_web_session()
-        session = AuthSession(
-            user_id=user.id,
-            client="web",
-            session_hash=tok_h,
-            access_expires_at=exp,
-            refresh_expires_at=exp,
-        )
-        db.add(session)
-        await db.commit()
-        set_session_cookie(response, raw_tok)
-        return AuthResponse(
-            user=UserResponse(id=user.id, email=user.email, name=user.name),
-            client="web"
-        )
+    # Issue dual credentials (HTTP-only session cookie for Web, Bearer token pair for Android)
+    raw_acc, acc_h, raw_ref, ref_h, acc_exp, ref_exp = create_android_token_pair()
+    raw_tok, tok_h, exp = create_web_session()
+
+    client = req.client or ("android" if "okhttp" in request.headers.get("user-agent", "").lower() else "web")
+    session = AuthSession(
+        user_id=user.id,
+        client=client,
+        session_hash=tok_h,
+        access_hash=acc_h,
+        refresh_hash=ref_h,
+        access_expires_at=exp,
+        refresh_expires_at=ref_exp,
+    )
+    db.add(session)
+    await db.commit()
+    set_session_cookie(response, raw_tok)
+
+    display_name = user.name or req.displayName or user.email.split("@")[0]
+    return AuthResponse(
+        user=UserResponse(id=user.id, email=user.email, name=user.name),
+        client=client,
+        userId=str(user.id),
+        email=user.email,
+        displayName=display_name,
+        name=user.name,
+        accessToken=raw_acc,
+        refreshToken=raw_ref,
+        expiresInSeconds=900,
+        access_token=raw_acc,
+        refresh_token=raw_ref,
+        expires_in=900,
+    )
 
 
 @router.post("/login", response_model=AuthResponse)
@@ -136,45 +133,44 @@ async def login(
     if not user or not verify_password(req.password, user.password_hash):
         raise UnauthorizedException("Invalid email or password")
 
-    if req.client == "android":
-        raw_acc, acc_h, raw_ref, ref_h, acc_exp, ref_exp = create_android_token_pair()
-        session = AuthSession(
-            user_id=user.id,
-            client="android",
-            access_hash=acc_h,
-            refresh_hash=ref_h,
-            access_expires_at=acc_exp,
-            refresh_expires_at=ref_exp,
-        )
-        db.add(session)
-        await db.commit()
-        return AuthResponse(
-            user=UserResponse(id=user.id, email=user.email, name=user.name),
-            client="android",
-            access_token=raw_acc,
-            refresh_token=raw_ref,
-            expires_in=900,
-        )
-    else:
-        raw_tok, tok_h, exp = create_web_session()
-        session = AuthSession(
-            user_id=user.id,
-            client="web",
-            session_hash=tok_h,
-            access_expires_at=exp,
-            refresh_expires_at=exp,
-        )
-        db.add(session)
-        await db.commit()
-        set_session_cookie(response, raw_tok)
-        return AuthResponse(
-            user=UserResponse(id=user.id, email=user.email, name=user.name),
-            client="web"
-        )
+    # Issue dual credentials
+    raw_acc, acc_h, raw_ref, ref_h, acc_exp, ref_exp = create_android_token_pair()
+    raw_tok, tok_h, exp = create_web_session()
+
+    client = req.client or ("android" if "okhttp" in request.headers.get("user-agent", "").lower() else "web")
+    session = AuthSession(
+        user_id=user.id,
+        client=client,
+        session_hash=tok_h,
+        access_hash=acc_h,
+        refresh_hash=ref_h,
+        access_expires_at=exp,
+        refresh_expires_at=ref_exp,
+    )
+    db.add(session)
+    await db.commit()
+    set_session_cookie(response, raw_tok)
+
+    display_name = user.name or user.email.split("@")[0]
+    return AuthResponse(
+        user=UserResponse(id=user.id, email=user.email, name=user.name),
+        client=client,
+        userId=str(user.id),
+        email=user.email,
+        displayName=display_name,
+        name=user.name,
+        accessToken=raw_acc,
+        refreshToken=raw_ref,
+        expiresInSeconds=900,
+        access_token=raw_acc,
+        refresh_token=raw_ref,
+        expires_in=900,
+    )
 
 
 @router.post("/demo", response_model=AuthResponse)
 async def login_demo(
+    request: Request,
     response: Response,
     client: str = "web",
     db: AsyncSession = Depends(get_db),
@@ -186,46 +182,47 @@ async def login_demo(
     if not user:
         raise NotFoundException("Demo account not found. Please run seed script.")
 
-    if client == "android":
-        raw_acc, acc_h, raw_ref, ref_h, acc_exp, ref_exp = create_android_token_pair()
-        session = AuthSession(
-            user_id=user.id,
-            client="android",
-            access_hash=acc_h,
-            refresh_hash=ref_h,
-            access_expires_at=acc_exp,
-            refresh_expires_at=ref_exp,
-        )
-        db.add(session)
-        await db.commit()
-        return AuthResponse(
-            user=UserResponse(id=user.id, email=user.email, name=user.name),
-            client="android",
-            access_token=raw_acc,
-            refresh_token=raw_ref,
-            expires_in=900,
-        )
-    else:
-        raw_tok, tok_h, exp = create_web_session()
-        session = AuthSession(
-            user_id=user.id,
-            client="web",
-            session_hash=tok_h,
-            access_expires_at=exp,
-            refresh_expires_at=exp,
-        )
-        db.add(session)
-        await db.commit()
-        set_session_cookie(response, raw_tok)
-        return AuthResponse(
-            user=UserResponse(id=user.id, email=user.email, name=user.name),
-            client="web",
-        )
+    raw_acc, acc_h, raw_ref, ref_h, acc_exp, ref_exp = create_android_token_pair()
+    raw_tok, tok_h, exp = create_web_session()
+
+    effective_client = "android" if (client == "android" or "okhttp" in request.headers.get("user-agent", "").lower()) else "web"
+    session = AuthSession(
+        user_id=user.id,
+        client=effective_client,
+        session_hash=tok_h,
+        access_hash=acc_h,
+        refresh_hash=ref_h,
+        access_expires_at=exp,
+        refresh_expires_at=ref_exp,
+    )
+    db.add(session)
+    await db.commit()
+    set_session_cookie(response, raw_tok)
+
+    display_name = user.name or "Culinary Demo"
+    return AuthResponse(
+        user=UserResponse(id=user.id, email=user.email, name=user.name),
+        client=effective_client,
+        userId=str(user.id),
+        email=user.email,
+        displayName=display_name,
+        name=user.name,
+        accessToken=raw_acc,
+        refreshToken=raw_ref,
+        expiresInSeconds=900,
+        access_token=raw_acc,
+        refresh_token=raw_ref,
+        expires_in=900,
+    )
 
 
 @router.post("/refresh", response_model=AuthResponse)
 async def refresh_tokens(req: RefreshRequest, db: AsyncSession = Depends(get_db)):
-    ref_h = hash_token(req.refresh_token)
+    tok = req.refresh_token or req.refreshToken
+    if not tok:
+        raise UnauthorizedException("Missing refresh token")
+
+    ref_h = hash_token(tok)
     now = datetime.now(timezone.utc)
 
     stmt = select(AuthSession).where(
@@ -236,7 +233,6 @@ async def refresh_tokens(req: RefreshRequest, db: AsyncSession = Depends(get_db)
     session = res.scalar_one_or_none()
 
     if not session or session.refresh_expires_at <= now:
-        # If reuse of old token detected, revoke everything for security (§5.3)
         if session:
             session.revoked_at = now
             await db.commit()
@@ -257,9 +253,17 @@ async def refresh_tokens(req: RefreshRequest, db: AsyncSession = Depends(get_db)
     session.refresh_expires_at = ref_exp
     await db.commit()
 
+    display_name = user.name or user.email.split("@")[0]
     return AuthResponse(
         user=UserResponse(id=user.id, email=user.email, name=user.name),
         client="android",
+        userId=str(user.id),
+        email=user.email,
+        displayName=display_name,
+        name=user.name,
+        accessToken=raw_acc,
+        refreshToken=raw_ref,
+        expiresInSeconds=900,
         access_token=raw_acc,
         refresh_token=raw_ref,
         expires_in=900,
@@ -385,8 +389,10 @@ async def logout_all(
 async def get_me(user: User = Depends(get_current_user)):
     user_dict = {
         "id": str(user.id),
+        "userId": str(user.id),
         "email": user.email,
         "name": user.name,
+        "displayName": user.name or user.email.split("@")[0],
     }
     return {
         **user_dict,

@@ -23,8 +23,8 @@ router = APIRouter(prefix="/api/public", tags=["public"])
 async def get_public_showcase(db: AsyncSession = Depends(get_db)):
     # 1. Catalogue counts
     ing_count = (await db.execute(select(func.count(Ingredient.id)))).scalar() or 27
-    recipe_count = (await db.execute(select(func.count(Recipe.id)))).scalar() or 20
-    compound_count = (await db.execute(select(func.count(FlavourCompound.id)))).scalar() or 140
+    recipe_count = (await db.execute(select(func.count(Recipe.id)))).scalar() or 26
+    compound_count = (await db.execute(select(func.count(FlavourCompound.id)))).scalar() or 114
 
     # 2. Sample 3D flavour graph for hero / science scene
     showcase_ings = ["cardamom", "clove", "cinnamon", "cumin", "turmeric", "black pepper", "ginger", "garlic"]

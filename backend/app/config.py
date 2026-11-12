@@ -33,7 +33,7 @@ class Settings(BaseSettings):
     GEMINI_API_KEY: str = ""
     GOOGLE_API_KEY: str = ""
     OPENAI_API_KEY: str = ""
-    VISION_MODEL: str = "gemini-2.0-flash"
+    VISION_MODEL: str = "gemini-flash-lite-latest"
 
     # USDA FoodData Central
     FDC_API_KEY: str = "DEMO_KEY"

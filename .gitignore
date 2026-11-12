@@ -33,3 +33,7 @@ screenshots/
 .idea/
 local.properties
 *.apk
+
+# Credentials and keys
+*.pem
+*.key

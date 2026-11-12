@@ -270,7 +270,7 @@ class Recipe(Base):
     fat_g: Mapped[float] = mapped_column(Float, default=0.0, nullable=False)
     fiber_g: Mapped[float] = mapped_column(Float, default=0.0, nullable=False)
 
-    source: Mapped[str] = mapped_column(String(50), default="demo", nullable=False)  # recipedb_live, demo
+    source: Mapped[str] = mapped_column(String(50), default="database_catalog", nullable=False)  # foodoscope_live, database_catalog
     source_id: Mapped[Optional[str]] = mapped_column(String(100), nullable=True)
 
     ingredients: Mapped[List["RecipeIngredient"]] = relationship("RecipeIngredient", back_populates="recipe", cascade="all, delete-orphan")

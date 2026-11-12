@@ -16,17 +16,19 @@ class RegisterRequest(BaseModel):
     email: EmailStr
     password: str = Field(..., min_length=8)
     name: Optional[str] = None
-    client: str = Field("web", pattern="^(web|android)$")
+    displayName: Optional[str] = None
+    client: Optional[str] = Field("web")
 
 
 class LoginRequest(BaseModel):
     email: EmailStr
     password: str
-    client: str = Field("web", pattern="^(web|android)$")
+    client: Optional[str] = Field("web")
 
 
 class RefreshRequest(BaseModel):
-    refresh_token: str
+    refresh_token: Optional[str] = None
+    refreshToken: Optional[str] = None
 
 
 class ForgotPasswordRequest(BaseModel):
@@ -47,6 +49,13 @@ class UserResponse(BaseModel):
 class AuthResponse(BaseModel):
     user: UserResponse
     client: str
+    userId: Optional[str] = None
+    email: Optional[str] = None
+    displayName: Optional[str] = None
+    name: Optional[str] = None
+    accessToken: Optional[str] = None
+    refreshToken: Optional[str] = None
+    expiresInSeconds: Optional[int] = None
     access_token: Optional[str] = None
     refresh_token: Optional[str] = None
     expires_in: Optional[int] = None
@@ -103,6 +112,7 @@ class SettingsUpdateRequest(BaseModel):
 # ==============================================================================
 
 class PantryItemCreate(BaseModel):
+    id: Optional[str] = None
     name: str
     category: str = "Spices"
     quantity: float = 100.0
@@ -110,6 +120,7 @@ class PantryItemCreate(BaseModel):
     confidence: float = 1.0
     confirmed: bool = True
     source: str = "manual"
+    updatedAtMs: Optional[int] = None
 
 
 class PantryItemUpdate(BaseModel):
@@ -149,4 +160,8 @@ class SyncOpItem(BaseModel):
 
 
 class SyncPushRequest(BaseModel):
-    ops: List[SyncOpItem]
+    ops: Optional[List[SyncOpItem]] = None
+    clientId: Optional[str] = None
+    idempotencyKeys: Optional[List[str]] = None
+    pantryUpdates: Optional[List[Dict[str, Any]]] = None
+    timestampMs: Optional[int] = None

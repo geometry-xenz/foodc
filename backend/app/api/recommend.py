@@ -3,7 +3,7 @@ Computational Gastronomy Recommendation API.
 Conforms to §5.4, §5.6, §11, and §12.
 """
 from typing import Any, Dict, List, Optional, Set
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, Query, Request
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
@@ -82,8 +82,12 @@ async def get_recommendations(
     res = await db.execute(stmt)
     db_recipes = res.scalars().all()
 
-    candidates: List[Dict[str, Any]] = [
-        {
+    seen_titles = set()
+    candidates: List[Dict[str, Any]] = []
+
+    for r in db_recipes:
+        seen_titles.add(r.title.strip().lower())
+        candidates.append({
             "id": str(r.id),
             "title": r.title,
             "cuisine": r.cuisine,
@@ -95,12 +99,39 @@ async def get_recommendations(
             "carbs_g": r.carbs_g,
             "fat_g": r.fat_g,
             "fiber_g": r.fiber_g,
-            "source": r.source,
+            "source": r.source if r.source != "demo" else "database_catalog",
             "ingredients": [i.name for i in r.ingredients],
             "utensils": r.utensils,
-        }
-        for r in db_recipes
-    ]
+        })
+
+    # Fetch live recipes from Foodoscope RecipeDB if ingredients available
+    if pantry:
+        try:
+            recipedb = RecipeDBService(db)
+            live_recipes = await recipedb.search_by_ingredients(pantry)
+            for lr in live_recipes:
+                ltitle = lr.get("title", "").strip().lower()
+                if ltitle and ltitle not in seen_titles:
+                    seen_titles.add(ltitle)
+                    candidates.append({
+                        "id": lr.get("id") or str(len(candidates) + 1),
+                        "title": lr.get("title", "Untitled Recipe"),
+                        "cuisine": lr.get("cuisine", "Global"),
+                        "diet": lr.get("diet", "any"),
+                        "minutes": lr.get("minutes", 30),
+                        "servings": lr.get("servings", 2),
+                        "calories": lr.get("calories", 350.0),
+                        "protein_g": lr.get("protein_g", 15.0),
+                        "carbs_g": lr.get("carbs_g", 40.0),
+                        "fat_g": lr.get("fat_g", 12.0),
+                        "fiber_g": lr.get("fiber_g", 4.0),
+                        "source": lr.get("source", "foodoscope_live"),
+                        "ingredients": lr.get("ingredients", []),
+                        "utensils": ["pan", "knife"],
+                    })
+        except Exception as ex:
+            # Fallback gracefully to catalog
+            pass
 
     # Load ingredient compound map for flavour pairing
     comp_stmt = select(IngredientCompound)
@@ -130,17 +161,24 @@ async def get_recommendations(
         "count": len(ranked),
         "recipes": ranked,
         "unlock": unlock,
-        "source": "recipedb_live" if any(r.get("source") == "recipedb_live" for r in ranked) else "demo",
+        "source": "foodoscope_live" if any(r.get("source") == "foodoscope_live" for r in ranked) else "database_catalog",
     }
 
 
 @router.get("/substitute")
-async def get_ingredient_substitute(ingredient: str, db: AsyncSession = Depends(get_db)):
+async def get_ingredient_substitute(
+    ingredient: str,
+    request: Request,
+    format: Optional[str] = Query(None),
+    db: AsyncSession = Depends(get_db),
+):
     """Find flavour-match substitutes based on shared volatile molecules."""
     ing_clean = ingredient.strip().lower()
     flavordb = FlavorDBService(db)
     compounds = await flavordb.get_ingredient_compounds(ing_clean)
     if not compounds:
+        if format == "list" or "okhttp" in request.headers.get("user-agent", "").lower():
+            return []
         return {"ingredient": ing_clean, "substitutes": []}
 
     my_comps = {c["name"].lower() for c in compounds}
@@ -156,11 +194,22 @@ async def get_ingredient_substitute(ingredient: str, db: AsyncSession = Depends(
             overlap_map[row.ingredient_name] = overlap_map.get(row.ingredient_name, 0) + 1
 
     sorted_subs = sorted(overlap_map.items(), key=lambda x: x[1], reverse=True)[:4]
+    sub_list = [
+        {
+            "name": name.title(),
+            "shared_compounds": count,
+            "sharedCompounds": count,
+            "ingredient": name.lower(),
+        }
+        for name, count in sorted_subs
+    ]
+
+    # Return List directly if requested by Android Retrofit
+    if format == "list" or "okhttp" in request.headers.get("user-agent", "").lower():
+        return sub_list
+
     return {
         "ingredient": ing_clean,
         "shared_compound_count": len(my_comps),
-        "substitutes": [
-            {"name": name.title(), "shared_compounds": count}
-            for name, count in sorted_subs
-        ]
+        "substitutes": sub_list,
     }

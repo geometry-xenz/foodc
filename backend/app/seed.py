@@ -202,7 +202,7 @@ async def seed():
                         "servings": 2,
                         "ingredients": [{"name": i, "quantity": 100, "unit": "g"} if isinstance(i, str) else i for i in item.get("ingredients", [])],
                         "instructions": item.get("instructions", []),
-                        "source": "demo"
+                        "source": "database_catalog"
                     })
 
         print(f"📖 Loaded {len(all_recipes)} candidate recipes for seeding.")
@@ -275,7 +275,7 @@ async def seed():
                 carbs_g=per_s["carbs_g"],
                 fat_g=per_s["fat_g"],
                 fiber_g=per_s["fiber_g"],
-                source="demo"
+                source="database_catalog"
             )
             db.add(rec_obj)
             await db.flush()

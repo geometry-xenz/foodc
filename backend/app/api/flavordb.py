@@ -50,9 +50,9 @@ async def get_ingredient_flavour_profile(ingredient: str, db: AsyncSession = Dep
         "ingredient": ingredient,
         "compounds": compounds,
         "compound_count": len(compounds),
-        # Live FlavorDB rows carry PubChem ids; seeded fixture rows do not.
+        # Live FlavorDB rows carry PubChem ids; seeded catalog rows do not.
         "provenance": (
             "flavordb_live" if compounds and all(c.get("pubchem_id") for c in compounds)
-            else "curated_fixture" if compounds else "unavailable"
+            else "database_catalog" if compounds else "unavailable"
         ),
     }

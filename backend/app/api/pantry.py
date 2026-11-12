@@ -66,6 +66,7 @@ async def get_pantry(user: User = Depends(get_current_user), db: AsyncSession = 
     )
     res = await db.execute(stmt)
     items = res.scalars().all()
+    now_ms = int(datetime.now(timezone.utc).timestamp() * 1000)
     return [
         {
             "id": str(i.id),
@@ -77,6 +78,7 @@ async def get_pantry(user: User = Depends(get_current_user), db: AsyncSession = 
             "confirmed": i.confirmed,
             "source": i.source,
             "version": i.version,
+            "updatedAtMs": int(i.updated_at.timestamp() * 1000) if i.updated_at else now_ms,
         }
         for i in items
     ]
@@ -101,22 +103,38 @@ async def add_pantry_item(
     )
     res = await db.execute(stmt)
     existing = res.scalar_one_or_none()
+    now = datetime.now(timezone.utc)
+    now_ms = int(now.timestamp() * 1000)
 
     if existing:
         existing.quantity += item.quantity
         existing.confidence = max(existing.confidence, item.confidence)
         existing.version += 1
+        existing.updated_at = now
         await db.commit()
         return {
             "id": str(existing.id),
             "name": existing.name,
+            "category": existing.category,
             "quantity": existing.quantity,
+            "unit": existing.unit,
+            "confidence": existing.confidence,
+            "confirmed": existing.confirmed,
+            "source": existing.source,
             "version": existing.version,
+            "updatedAtMs": int(existing.updated_at.timestamp() * 1000),
             "updated": True,
         }
 
+    item_id = uuid.uuid4()
+    if item.id:
+        try:
+            item_id = uuid.UUID(item.id)
+        except (ValueError, TypeError):
+            pass
+
     new_item = PantryItem(
-        id=uuid.uuid4(),
+        id=item_id,
         user_id=user.id,
         name=canonical,
         category=item.category,
@@ -132,8 +150,14 @@ async def add_pantry_item(
     return {
         "id": str(new_item.id),
         "name": new_item.name,
+        "category": new_item.category,
         "quantity": new_item.quantity,
+        "unit": new_item.unit,
+        "confidence": new_item.confidence,
+        "confirmed": new_item.confirmed,
+        "source": new_item.source,
         "version": 1,
+        "updatedAtMs": int(new_item.created_at.timestamp() * 1000) if new_item.created_at else now_ms,
         "created": True,
     }
 
