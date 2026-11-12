@@ -80,8 +80,8 @@ async def seed():
 
         # 1. Categories
         for cat in CATEGORIES:
-            res = await db.execute(select(PantryCategory).where(PantryCategory.name == cat))
-            if not res.scalar_one_or_none():
+            res = await db.execute(select(PantryCategory).where(PantryCategory.name == cat).limit(1))
+            if not res.scalars().first():
                 db.add(PantryCategory(name=cat))
         await db.flush()
 
@@ -98,8 +98,8 @@ async def seed():
                 nut_map[ing_key.lower().strip()] = p100
 
                 # Check if ingredient exists
-                res = await db.execute(select(Ingredient).where(Ingredient.name == ing_key.lower().strip()))
-                ing_obj = res.scalar_one_or_none()
+                res = await db.execute(select(Ingredient).where(Ingredient.name == ing_key.lower().strip()).limit(1))
+                ing_obj = res.scalars().first()
                 if not ing_obj:
                     cat = "Spices"
                     if ing_key in ("chicken", "eggs"): cat = "Protein"
@@ -165,16 +165,16 @@ async def seed():
                 for comp in comps:
                     comp_name = str(comp).strip().lower()
                     # Check compound exists
-                    c_res = await db.execute(select(FlavourCompound).where(FlavourCompound.name == comp_name))
-                    if not c_res.scalar_one_or_none():
+                    c_res = await db.execute(select(FlavourCompound).where(FlavourCompound.name == comp_name).limit(1))
+                    if not c_res.scalars().first():
                         db.add(FlavourCompound(name=comp_name, aroma_profile=v.get("flavor_profile", [])))
 
                     # Link ingredient-compound
                     ic_stmt = select(IngredientCompound).where(
                         IngredientCompound.ingredient_name == ing_key.lower().strip(),
                         IngredientCompound.compound_name == comp_name
-                    )
-                    if not (await db.execute(ic_stmt)).scalar_one_or_none():
+                    ).limit(1)
+                    if not (await db.execute(ic_stmt)).scalars().first():
                         db.add(IngredientCompound(ingredient_name=ing_key.lower().strip(), compound_name=comp_name))
 
         await db.flush()
@@ -210,8 +210,8 @@ async def seed():
 
         for r in all_recipes:
             title = r.get("title") or r.get("Recipe_title") or "Untitled"
-            res = await db.execute(select(Recipe).where(Recipe.title == title))
-            if res.scalar_one_or_none():
+            res = await db.execute(select(Recipe).where(Recipe.title == title).limit(1))
+            if res.scalars().first():
                 continue
 
             servings = int(r.get("servings", 2)) or 2
@@ -295,8 +295,8 @@ async def seed():
 
         # 5. Demo User (demo@drishyam.ai / drishyam2026)
         demo_email = "demo@drishyam.ai"
-        res_user = await db.execute(select(User).where(User.email == demo_email))
-        demo_user = res_user.scalar_one_or_none()
+        res_user = await db.execute(select(User).where(User.email == demo_email).limit(1))
+        demo_user = res_user.scalars().first()
         if not demo_user:
             demo_user = User(
                 id=uuid.uuid4(),

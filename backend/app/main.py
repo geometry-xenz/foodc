@@ -37,6 +37,21 @@ async def lifespan(app: FastAPI):
     # Ensure database schema exists on startup
     async with engine.begin() as conn:
         await conn.run_sync(Base.metadata.create_all)
+
+    # Automatically seed initial catalog if database is fresh
+    try:
+        from app.database import AsyncSessionLocal
+        from app.models.entities import Ingredient
+        from sqlalchemy import select, func
+        async with AsyncSessionLocal() as session:
+            count = (await session.execute(select(func.count(Ingredient.id)))).scalar() or 0
+            if count == 0:
+                from app.seed import seed
+                await seed()
+    except Exception as e:
+        import logging
+        logging.getLogger("drishyam.startup").warning(f"Auto-seeding check skipped: {e}")
+
     yield
     await engine.dispose()
 
